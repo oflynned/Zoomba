@@ -35,9 +35,29 @@ public class Behaviour {
         }
     }
 
-    public static void collideWall(Circle circle) {
-        circle.setOrientation(circle.getOrientation() - 360);
+    public static void collideWall(Direction direction, Circle circle) {
+        if(direction.equals(Direction.Left)) {
+            circle.setX(circle.getX() + circle.getRadius());
+            circle.setOrientation(getVerticalBounce(circle.getOrientation()));
+        } else if(direction.equals(Direction.Right)) {
+            circle.setX(circle.getX() - circle.getRadius());
+            circle.setOrientation(getVerticalBounce(circle.getOrientation()));
+        } else if (direction.equals(Direction.Top)) {
+            circle.setY(circle.getY() + circle.getRadius());
+            circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
+        } else if (direction.equals(Direction.Bottom)) {
+            circle.setY(circle.getY() - circle.getRadius());
+            circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
+        }
+        Gdx.app.log("Debug", circle.getOrientation() + " degrees");
+    }
 
+    public static float getVerticalBounce(float angle) {
+        return 180 - angle;
+    }
+
+    public static float getHorizontalBounce(float angle) {
+        return 360 - angle;
     }
 
     public static void circleCollision(Circle circle1, Circle circle2) {

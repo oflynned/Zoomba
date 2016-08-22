@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 public class Constants {
     public static final float CIRCLE_RADIUS = 50;
     public static final float CIRCLE_VELOCITY = 10;
-    public static final int CIRCLE_AMOUNT = 1;
+    public static final int CIRCLE_AMOUNT = 50;
     public static final float CIRCLE_MASS = 1;
 
     //multisampling

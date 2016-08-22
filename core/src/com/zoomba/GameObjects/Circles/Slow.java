@@ -8,7 +8,7 @@ import com.zoomba.GameObjects.ObjectFactory.Circle;
 import com.zoomba.GameObjects.ObjectFactory.GameObject;
 import com.zoomba.Services.Constants;
 import com.zoomba.Services.Manager.State.Behaviour;
-import com.zoomba.Services.Manager.State.GameState;
+import com.zoomba.Services.Manager.State.Direction;
 import com.zoomba.UI.Screens.GameScreen;
 
 /**
@@ -49,9 +49,16 @@ public class Slow extends Circle {
 
     @Override
     public void onCollision() {
-        //Gdx.app.log("Slow < Circle < GameObject", "onCollision() @ (" + getX() + "," + getY() + ")");
-        Behaviour.collideWall(this);
-        onSpawn();
+        Gdx.app.log("Slow < Circle < GameObject", "onCollision() @ (" + getX() + "," + getY() + ")");
+        if(isLeftCollision()) {
+            Behaviour.collideWall(Direction.Left, this);
+        } else if (isTopCollision()) {
+            Behaviour.collideWall(Direction.Top, this);
+        } else if (isRightCollision()) {
+            Behaviour.collideWall(Direction.Right, this);
+        } else if (isBottomCollision()) {
+            Behaviour.collideWall(Direction.Bottom, this);
+        }
     }
 
     @Override
@@ -65,7 +72,22 @@ public class Slow extends Circle {
     }
 
     public boolean isCollision() {
-        return getX() <= 0 || getX() + getRadius() * 2 >= GameScreen.width ||
-                getY() - getRadius() <= 0 || getY() + getRadius() >= GameScreen.height;
+        return isLeftCollision() || isTopCollision() || isRightCollision() || isBottomCollision();
+    }
+
+    public boolean isLeftCollision() {
+        return getX() <= 0 ;
+    }
+
+    public boolean isTopCollision() {
+        return getY() - getRadius() <= 0;
+    }
+
+    public boolean isRightCollision() {
+        return getX() + getRadius() * 2 >= GameScreen.width;
+    }
+
+    public boolean isBottomCollision() {
+        return getY() + getRadius() >= GameScreen.height;
     }
 }
