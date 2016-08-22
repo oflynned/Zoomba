@@ -25,10 +25,9 @@ public class GameScreen implements Screen, GestureDetector.GestureListener {
     private Zoomba zoomba;
     ArrayList<Circle> slowCircles;
 
-    float zoomFactor = 0f;
     private OrthographicCamera camera;
 
-    float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
+    public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
 
     public GameScreen(Zoomba zoomba) {
         this.zoomba = zoomba;
@@ -44,7 +43,7 @@ public class GameScreen implements Screen, GestureDetector.GestureListener {
                     GameObject.getRandomOrientation(), Constants.RED_500, Constants.CIRCLE_VELOCITY));
         }
         for (Circle circle : slowCircles) {
-            System.out.println(circle.getClass() + " " + circle.getX() + " " + circle.getY());
+            Gdx.app.log("GameScreen", circle.getClass() + " " + circle.getX() + " " + circle.getY());
         }
     }
 
@@ -183,6 +182,9 @@ public class GameScreen implements Screen, GestureDetector.GestureListener {
 
         @Override
         public boolean tap(float x, float y, int count, int button) {
+            for(Circle circle : getCircles()) {
+                circle.onSpawn();
+            }
             Gdx.app.log("GestureDetectorTest", "tap at " + x + ", " + y + ", count: " + count);
             return false;
         }

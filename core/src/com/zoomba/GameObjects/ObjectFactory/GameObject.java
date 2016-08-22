@@ -38,11 +38,11 @@ public abstract class GameObject {
     }
 
     public float getXVel() {
-        return (float) (Math.sin(getOrientation()) * getVelocity());
+        return (float) (Math.cos(getOrientation()) * getVelocity());
     }
 
     public float getYVel() {
-        return (float) (Math.cos(getOrientation()) * getVelocity());
+        return (float) (Math.sin(getOrientation()) * getVelocity());
     }
 
     public double getVelocity() {

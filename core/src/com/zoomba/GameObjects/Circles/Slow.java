@@ -1,6 +1,5 @@
 package com.zoomba.GameObjects.Circles;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,6 +7,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zoomba.GameObjects.ObjectFactory.Circle;
 import com.zoomba.GameObjects.ObjectFactory.GameObject;
 import com.zoomba.Services.Constants;
+import com.zoomba.Services.Manager.State.Behaviour;
+import com.zoomba.Services.Manager.State.GameState;
+import com.zoomba.UI.Screens.GameScreen;
 
 /**
  * Created by ed on 20/08/16.
@@ -23,7 +25,7 @@ public class Slow extends Circle {
         setX(GameObject.getRandomX());
         setY(GameObject.getRandomY());
         setOrientation(GameObject.getRandomOrientation());
-        System.out.println("onSpawn() @ (" + getX() + "," + getY() + ") with vels " + getXVel() + " " + getYVel());
+        Gdx.app.log("Slow < Circle < GameObject", "onSpawn() @ (" + getX() + "," + getY() + ") with vels " + getXVel() + " " + getYVel());
     }
 
     @Override
@@ -36,7 +38,7 @@ public class Slow extends Circle {
 
     @Override
     public void onMove() {
-        System.out.println("onMove() @ (" + getX() + "," + getY() + ") moving " + getOrientation());
+        //Gdx.app.log("Slow < Circle < GameObject", "onMove() @ (" + getX() + "," + getY() + ") moving at angle " + getOrientation());
         if(isCollision()) {
             onCollision();
         } else {
@@ -47,10 +49,9 @@ public class Slow extends Circle {
 
     @Override
     public void onCollision() {
-        System.out.println("onCollision() @ (" + getX() + "," + getY() + ")");
-
+        //Gdx.app.log("Slow < Circle < GameObject", "onCollision() @ (" + getX() + "," + getY() + ")");
+        Behaviour.collideWall(this);
         onSpawn();
-        //super.setOrientation(Behaviour.collide(getX(), getY(), getOrientation()));
     }
 
     @Override
@@ -64,6 +65,7 @@ public class Slow extends Circle {
     }
 
     public boolean isCollision() {
-        return getX() <= 0 || getX() >= super.getWidth() || getY() <= 0 || getY() >= super.getHeight();
+        return getX() <= 0 || getX() + getRadius() * 2 >= GameScreen.width ||
+                getY() - getRadius() <= 0 || getY() + getRadius() >= GameScreen.height;
     }
 }
