@@ -1,4 +1,4 @@
-package com.zoomba.GameObjects;
+package com.zoomba.GameObjects.UI;
 
 /**
  * Created by ed on 09/08/16.

@@ -1,62 +1,56 @@
 package com.zoomba.GameObjects.Circles;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.zoomba.GameObjects.CircleFactory.Circle;
-import com.zoomba.GameObjects.CircleFactory.CircleOrientation;
-import com.zoomba.GameObjects.CircleFactory.GameObject;
+import com.zoomba.GameObjects.ObjectFactory.Circle;
+import com.zoomba.GameObjects.ObjectFactory.GameObject;
 import com.zoomba.Services.Constants;
 
 /**
  * Created by ed on 20/08/16.
  */
-public class Slow extends GameObject implements Circle {
-    float width = Gdx.graphics.getWidth();
-    float height = Gdx.graphics.getHeight();
+public class Slow extends Circle {
 
-    public Slow(float x, float y, float radius, CircleOrientation orientation) {
-        super(x, y, radius, orientation);
-        onSpawn();
+    public Slow(float x, float y, float radius, float orientation, Color color, float velocity) {
+        super(x, y, radius, orientation, color, velocity);
     }
 
     @Override
     public void onSpawn() {
-        System.out.println("onSpawn()");
+        setX(GameObject.getRandomX());
+        setY(GameObject.getRandomY());
+        setOrientation(GameObject.getRandomOrientation());
+        System.out.println("onSpawn() @ (" + getX() + "," + getY() + ") with vels " + getXVel() + " " + getYVel());
     }
 
     @Override
-    public void onDraw(SpriteBatch batch, ShapeRenderer renderer, float scale) {
+    public void onDraw(SpriteBatch batch, ShapeRenderer renderer) {
         renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.circle(getX() + getRadius(), getY(), getRadius() * scale);
-        renderer.setColor(Color.BLACK);
+        renderer.circle(getX() + getRadius(), getY(), getRadius());
+        renderer.setColor(Constants.RED_500);
         renderer.end();
     }
 
     @Override
     public void onMove() {
-        System.out.println(getX() + " " + getY() + " " + getOrientation());
-        if(getX() <= 0 || getX() >= width || getY() <= 0 || getY() >= height) {
+        System.out.println("onMove() @ (" + getX() + "," + getY() + ") moving " + getOrientation());
+        if(isCollision()) {
             onCollision();
         } else {
-            if(getOrientation().equals(CircleOrientation.Leftwards))
-                setX(getX() - Constants.CIRCLE_VELOCITY);
-            else if (getOrientation().equals(CircleOrientation.Rightwards))
-                setX(getX() + Constants.CIRCLE_VELOCITY);
+            setX(getX() + getXVel());
+            setY(getY() + getYVel());
         }
     }
 
     @Override
     public void onCollision() {
-        System.out.println("onCollision()");
-        if(getX() == width && getOrientation().equals(CircleOrientation.Rightwards)) {
-            setOrientation(CircleOrientation.Leftwards);
-            setX(getX() - 20);
-        } else if (getX() == 0 && getOrientation().equals(CircleOrientation.Leftwards)) {
-            setOrientation(CircleOrientation.Rightwards);
-            setX(getX() + 20);
-        }
+        System.out.println("onCollision() @ (" + getX() + "," + getY() + ")");
+
+        onSpawn();
+        //super.setOrientation(Behaviour.collide(getX(), getY(), getOrientation()));
     }
 
     @Override
@@ -67,5 +61,9 @@ public class Slow extends GameObject implements Circle {
     @Override
     public void onDestroy() {
 
+    }
+
+    public boolean isCollision() {
+        return getX() <= 0 || getX() >= super.getWidth() || getY() <= 0 || getY() >= super.getHeight();
     }
 }

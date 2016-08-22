@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.zoomba.Services.Constants;
 import com.zoomba.Zoomba;
 
 public class AndroidLauncher extends AndroidApplication {
@@ -16,6 +17,7 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.hideStatusBar = true;
 		config.useImmersiveMode = true;
+		config.numSamples = Constants.ANTIALIASING;
 		initialize(new Zoomba(), config);
 	}
 
