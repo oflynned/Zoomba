@@ -51,13 +51,13 @@ public class Slow extends Circle {
     public void onCollision() {
         Gdx.app.log("Slow < Circle < GameObject", "onCollision() @ (" + getX() + "," + getY() + ")");
         if(isLeftCollision()) {
-            Behaviour.collideWall(Direction.Left, this);
+            Behaviour.generateStateTransition(Direction.Left, this);
         } else if (isTopCollision()) {
-            Behaviour.collideWall(Direction.Top, this);
+            Behaviour.generateStateTransition(Direction.Top, this);
         } else if (isRightCollision()) {
-            Behaviour.collideWall(Direction.Right, this);
+            Behaviour.generateStateTransition(Direction.Right, this);
         } else if (isBottomCollision()) {
-            Behaviour.collideWall(Direction.Bottom, this);
+            Behaviour.generateStateTransition(Direction.Bottom, this);
         }
     }
 
@@ -76,18 +76,18 @@ public class Slow extends Circle {
     }
 
     public boolean isLeftCollision() {
-        return getX() <= 0 ;
+        return getX()<= 0 ;
     }
 
     public boolean isTopCollision() {
-        return getY() - getRadius() <= 0;
+        return getY() + getRadius() >= GameScreen.height;
     }
 
     public boolean isRightCollision() {
-        return getX() + getRadius() * 2 >= GameScreen.width;
+        return getX() + getRadius()*2 >= GameScreen.width;
     }
 
     public boolean isBottomCollision() {
-        return getY() + getRadius() >= GameScreen.height;
+        return getY() - getRadius() <= 0;
     }
 }

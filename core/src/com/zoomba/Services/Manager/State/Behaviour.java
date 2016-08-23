@@ -2,6 +2,7 @@ package com.zoomba.Services.Manager.State;
 
 import com.badlogic.gdx.Gdx;
 import com.zoomba.GameObjects.ObjectFactory.Circle;
+import com.zoomba.UI.Screens.GameScreen;
 
 import java.util.Random;
 
@@ -9,44 +10,48 @@ import java.util.Random;
  * Created by ed on 22/08/2016.
  */
 public class Behaviour {
-    private static float width = Gdx.graphics.getWidth();
-    private static float height = Gdx.graphics.getHeight();
-
-    public static PhysicsState generateStateTransition() {
-        switch(new Random().nextInt(2)) {
+    public static void generateStateTransition(Direction direction, Circle circle) {
+        collideWall(direction, circle);
+        /*switch(new Random().nextInt(1)) {
             case 0:
-                return PhysicsState.WallCollision;
+                collideWall(direction, circle);
             case 1:
-                return PhysicsState.Teleport;
-            default:
-                return null;
-        }
+                passThroughWall(direction, circle);
+        }*/
     }
 
-    public static void passThroughWall(Circle circle) {
-        if(circle.getY() - circle.getRadius() <= 0) {
-            circle.setY(height - circle.getRadius());
-        } else if (circle.getY() + circle.getRadius() >= height) {
-            circle.setY(circle.getRadius());
-        } else if(circle.getX() - circle.getRadius() <= 0) {
-            circle.setX(width - circle.getRadius());
-        } else if(circle.getX() + circle.getRadius() >= width) {
-            circle.setX(circle.getRadius());
+    public static void passThroughWall(Direction direction, Circle circle) {
+        if(direction.equals(Direction.Left)) {
+            Gdx.app.log("PhysicsDebug", "LEFT");
+            circle.setX(GameScreen.width - 2*circle.getRadius() - 10);
+            circle.setY(GameScreen.height - circle.getY());
+        } else if (direction.equals(Direction.Top)) {
+            Gdx.app.log("PhysicsDebug", "TOP");
+            circle.setX(GameScreen.width - circle.getX());
+            circle.setY(circle.getRadius() + 10);
+        } else if(direction.equals(Direction.Right)) {
+            Gdx.app.log("PhysicsDebug", "RIGHT");
+            circle.setX(10);
+            circle.setY(GameScreen.height - circle.getY());
+        } else if(direction.equals(Direction.Bottom)) {
+            Gdx.app.log("PhysicsDebug", "BOTTOM");
+            circle.setX(GameScreen.width - circle.getX());
+            circle.setY(GameScreen.height - circle.getRadius() - 10);
         }
     }
 
     public static void collideWall(Direction direction, Circle circle) {
         if(direction.equals(Direction.Left)) {
-            circle.setX(circle.getX() + circle.getRadius());
+            circle.setX(circle.getX() + 10);
             circle.setOrientation(getVerticalBounce(circle.getOrientation()));
         } else if(direction.equals(Direction.Right)) {
-            circle.setX(circle.getX() - circle.getRadius());
+            circle.setX(circle.getX() - 10);
             circle.setOrientation(getVerticalBounce(circle.getOrientation()));
         } else if (direction.equals(Direction.Top)) {
-            circle.setY(circle.getY() + circle.getRadius());
+            circle.setY(circle.getY() - 10);
             circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
         } else if (direction.equals(Direction.Bottom)) {
-            circle.setY(circle.getY() - circle.getRadius());
+            circle.setY(circle.getY() + 10);
             circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
         }
         Gdx.app.log("Debug", circle.getOrientation() + " degrees");
