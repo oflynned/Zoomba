@@ -17,14 +17,16 @@ public abstract class GameObject {
     Color color;
     float orientation;
     double velocity;
+    int id;
 
-    public GameObject(float x, float y, float radius, float orientation, Color color, float velocity) {
+    public GameObject(float x, float y, float radius, float orientation, Color color, float velocity, int id) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.orientation = orientation;
         this.color = color;
         this.velocity = velocity;
+        this.id = id;
     }
 
     public void setX(float x) {
@@ -89,5 +91,9 @@ public abstract class GameObject {
 
     public Color getColor() {
         return color;
+    }
+
+    public int getId() {
+        return id;
     }
 }

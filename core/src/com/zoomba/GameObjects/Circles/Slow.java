@@ -16,8 +16,8 @@ import com.zoomba.UI.Screens.GameScreen;
  */
 public class Slow extends Circle {
 
-    public Slow(float x, float y, float radius, float orientation, Color color, float velocity) {
-        super(x, y, radius, orientation, color, velocity);
+    public Slow(float x, float y, float radius, float orientation, Color color, float velocity, int id) {
+        super(x, y, radius, orientation, color, velocity, id);
     }
 
     @Override
@@ -25,7 +25,8 @@ public class Slow extends Circle {
         setX(GameObject.getRandomX());
         setY(GameObject.getRandomY());
         setOrientation(GameObject.getRandomOrientation());
-        Gdx.app.log("Slow < Circle < GameObject", "onSpawn() @ (" + getX() + "," + getY() + ") with vels " + getXVel() + " " + getYVel());
+        Gdx.app.log(Constants.OBJECT_DEBUG, "onSpawn() @ (" + getX() + ", " + getY() + ") with vels " +
+                getXVel() + " " + getYVel() + ", id: " + getId());
     }
 
     @Override
@@ -38,7 +39,7 @@ public class Slow extends Circle {
 
     @Override
     public void onMove() {
-        //Gdx.app.log("Slow < Circle < GameObject", "onMove() @ (" + getX() + "," + getY() + ") moving at angle " + getOrientation());
+        //Gdx.app.log(Constants.OBJECT_DEBUG, "onMove() @ (" + getX() + "," + getY() + ") moving at angle " + getOrientation());
         if(isCollision()) {
             onCollision();
         } else {
@@ -49,7 +50,7 @@ public class Slow extends Circle {
 
     @Override
     public void onCollision() {
-        Gdx.app.log("Slow < Circle < GameObject", "onCollision() @ (" + getX() + "," + getY() + ")");
+        Gdx.app.log(Constants.OBJECT_DEBUG, "onCollision() @ (" + getX() + "," + getY() + ") with id " + getId());
         if(isLeftCollision()) {
             Behaviour.generateStateTransition(Direction.Left, this);
         } else if (isTopCollision()) {

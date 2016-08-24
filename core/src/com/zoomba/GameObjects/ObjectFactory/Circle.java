@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * Created by ed on 20/08/16.
  */
 public abstract class Circle extends GameObject {
-    public Circle(float x, float y, float radius, float orientation, Color color, float velocity) {
-        super(x, y, radius, orientation, color, velocity);
+    public Circle(float x, float y, float radius, float orientation, Color color, float velocity, int id) {
+        super(x, y, radius, orientation, color, velocity, id);
     }
 
     public abstract void onSpawn();

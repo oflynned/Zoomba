@@ -13,6 +13,12 @@ public class Constants {
     //multisampling
     public static final int ANTIALIASING = 4;
 
+    //debug labels
+    public static final String PHYSICS_DEBUG = "PhysicsDebug";
+    public static final String GAME_SCREEN_DEBUG = "GameScreen";
+    public static final String GESTURE_CONTROLLER_DEBUG = "GestureController";
+    public static final String OBJECT_DEBUG = "GameObject";
+
     //styles
     public static final Color BLUE_500 = parseColor("2196F3");
     public static final Color RED_500  = parseColor("F44336");

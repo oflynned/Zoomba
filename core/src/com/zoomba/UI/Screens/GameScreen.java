@@ -5,8 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.zoomba.GameObjects.ObjectFactory.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Factory;
 import com.zoomba.GameObjects.ObjectFactory.FactoryTypes;
@@ -21,19 +22,28 @@ import java.util.ArrayList;
 /**
  * Created by ed on 09/08/16.
  */
-public class GameScreen implements Screen, GestureDetector.GestureListener {
+public class GameScreen implements Screen {
     private Zoomba zoomba;
-    ArrayList<Circle> slowCircles;
+    private ArrayList<Circle> slowCircles;
 
-    private OrthographicCamera camera;
+    private Stage stage;
+    private OrthographicCamera worldCamera;
+    private GestureController gestureController = new GestureController();
 
     public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
-
+    private float viewportWidth = width, viewportHeight = height;
+    private Vector2 cameraCentre = new Vector2(width, height);
+    
     public GameScreen(Zoomba zoomba) {
         this.zoomba = zoomba;
-        this.camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        Gdx.input.setInputProcessor(new GestureDetector(this));
+        worldCamera = new OrthographicCamera();
+        stage = new Stage(new FitViewport(viewportWidth, viewportHeight));
+
+        worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
+
+        GestureDetector gestureDetector = new GestureDetector(20, 0.5f, 2, 0.15f, gestureController);
+        Gdx.input.setInputProcessor(gestureDetector);
 
         Factory circleFactory = Producer.getFactory(FactoryTypes.Circle);
         slowCircles = new ArrayList<Circle>();
@@ -43,7 +53,7 @@ public class GameScreen implements Screen, GestureDetector.GestureListener {
                     GameObject.getRandomOrientation(), Constants.RED_500, Constants.CIRCLE_VELOCITY));
         }
         for (Circle circle : slowCircles) {
-            Gdx.app.log("GameScreen", circle.getClass() + " " + circle.getX() + " " + circle.getY());
+            Gdx.app.log(Constants.GAME_SCREEN_DEBUG, circle.getClass() + " " + circle.getX() + " " + circle.getY());
         }
     }
 
@@ -57,9 +67,10 @@ public class GameScreen implements Screen, GestureDetector.GestureListener {
         Gdx.gl.glClearColor(33f / 255f, 150f / 255f, 243f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        handleInput();
-        getCamera().update();
-        getZoomba().getSpriteBatch().setProjectionMatrix(getCamera().combined);
+        stage.getViewport().apply();
+        stage.draw();
+        gestureController.update();
+        getZoomba().getSpriteBatch().setProjectionMatrix(worldCamera.combined);
 
         for (Circle circle : getCircles()) {
             getZoomba().getSpriteBatch().begin();
@@ -69,6 +80,9 @@ public class GameScreen implements Screen, GestureDetector.GestureListener {
 
             getZoomba().getSpriteBatch().end();
         }
+
+        stage.getViewport().update((int) viewportWidth, (int) viewportHeight, false);
+        worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
     }
 
     @Override
@@ -100,148 +114,94 @@ public class GameScreen implements Screen, GestureDetector.GestureListener {
         return zoomba;
     }
 
-    public OrthographicCamera getCamera() {
-        return camera;
-    }
-
     public ArrayList<Circle> getCircles() {
         return slowCircles;
     }
 
-    @Override
-    public boolean touchDown(float x, float y, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean tap(float x, float y, int count, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean longPress(float x, float y) {
-        return false;
-    }
-
-    @Override
-    public boolean fling(float velocityX, float velocityY, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean pan(float x, float y, float deltaX, float deltaY) {
-        camera.translate(-deltaX, deltaY);
-        return false;
-    }
-
-    public void handleInput() {
-        camera.zoom = MathUtils.clamp(camera.zoom, 1.5f, 1.8f);
-
-        float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-        float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
-
-        camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f,
-                width - effectiveViewportWidth / 2f);
-        camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f,
-                height - effectiveViewportHeight / 2f);
-    }
-
-
-    @Override
-    public boolean zoom(float initialDistance, float distance) {
-        camera.zoom += initialDistance >= distance ? 0.2 : -0.2;
-        return false;
-    }
-
-    @Override
-    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2,
-                         Vector2 pointer1, Vector2 pointer2) {
-        return false;
-    }
-
-    @Override
-    public void pinchStop() {
-
-    }
-
-    @Override
-    public boolean panStop(float x, float y, int pointer, int button) {
-        return false;
-    }
-
-    public class GestureController implements GestureDetector.GestureListener {
+    class GestureController implements GestureDetector.GestureListener {
         float velX, velY;
         boolean flinging = false;
         float initialScale = 1;
 
-        public boolean touchDown(float x, float y, int pointer, int button) {
+        public boolean touchDown (float x, float y, int pointer, int button) {
             flinging = false;
-            initialScale = camera.zoom;
+            initialScale = worldCamera.zoom;
             return false;
         }
 
         @Override
-        public boolean tap(float x, float y, int count, int button) {
-            for(Circle circle : getCircles()) {
-                circle.onSpawn();
-            }
-            Gdx.app.log("GestureDetectorTest", "tap at " + x + ", " + y + ", count: " + count);
+        public boolean tap (float x, float y, int count, int button) {
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "tap at " + x + ", " + y + ", count: " + count);
             return false;
         }
 
         @Override
-        public boolean longPress(float x, float y) {
-            Gdx.app.log("GestureDetectorTest", "long press at " + x + ", " + y);
+        public boolean longPress (float x, float y) {
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "long press at " + x + ", " + y);
             return false;
         }
 
         @Override
-        public boolean fling(float velocityX, float velocityY, int button) {
-            Gdx.app.log("GestureDetectorTest", "fling " + velocityX + ", " + velocityY);
+        public boolean fling (float velocityX, float velocityY, int button) {
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "fling " + velocityX + ", " + velocityY);
             flinging = true;
-            velX = camera.zoom * velocityX * 0.5f;
-            velY = camera.zoom * velocityY * 0.5f;
+            velX = worldCamera.zoom * velocityX * 0.5f;
+            velY = worldCamera.zoom * velocityY * 0.5f;
             return false;
         }
 
         @Override
-        public boolean pan(float x, float y, float deltaX, float deltaY) {
-            // Gdx.app.log("GestureDetectorTest", "pan at " + x + ", " + y);
-            camera.position.add(-deltaX * camera.zoom, deltaY * camera.zoom, 0);
+        public boolean pan (float x, float y, float deltaX, float deltaY) {
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "pan at " + x + ", " + y);
+            worldCamera.position.add(-deltaX * worldCamera.zoom, deltaY * worldCamera.zoom, 0);
             return false;
         }
 
         @Override
-        public boolean panStop(float x, float y, int pointer, int button) {
-            Gdx.app.log("GestureDetectorTest", "pan stop at " + x + ", " + y);
+        public boolean panStop (float x, float y, int pointer, int button) {
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "pan stop at " + x + ", " + y);
             return false;
         }
 
         @Override
-        public boolean zoom(float originalDistance, float currentDistance) {
+        public boolean zoom (float originalDistance, float currentDistance) {
             float ratio = originalDistance / currentDistance;
-            camera.zoom = initialScale * ratio;
-            System.out.println(camera.zoom);
+            worldCamera.zoom = initialScale / ratio;
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, worldCamera.zoom + " zoom");
+
+            viewportWidth = width * worldCamera.zoom;
+            viewportHeight = height * worldCamera.zoom;
+
+            if (viewportHeight < height || viewportWidth < width) {
+                viewportWidth = width;
+                viewportHeight = height;
+            }
+
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, viewportWidth + " " + viewportHeight);
             return false;
         }
 
         @Override
-        public boolean pinch(Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
+        public boolean pinch (Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
+            cameraCentre.x = (firstPointer.x + secondPointer.x) / 2;
+            cameraCentre.y = (firstPointer.y + secondPointer.y) / 2;
             return false;
         }
 
-        public void update() {
+        public void update () {
             if (flinging) {
                 velX *= 0.98f;
                 velY *= 0.98f;
-                camera.position.add(-velX * Gdx.graphics.getDeltaTime(), velY * Gdx.graphics.getDeltaTime(), 0);
+                worldCamera.position.add(-velX * Gdx.graphics.getDeltaTime(),
+                        velY * Gdx.graphics.getDeltaTime(), 0);
                 if (Math.abs(velX) < 0.01f) velX = 0;
                 if (Math.abs(velY) < 0.01f) velY = 0;
             }
         }
 
         @Override
-        public void pinchStop() {
+        public void pinchStop () {
+
         }
     }
 
