@@ -15,13 +15,14 @@ public class Constants {
 
     //debug labels
     public static final String PHYSICS_DEBUG = "PhysicsDebug";
+    public static final String PHYSICS_ATTRIBUTE_DEBUG = "PhysicsAttribute";
     public static final String GAME_SCREEN_DEBUG = "GameScreen";
     public static final String GESTURE_CONTROLLER_DEBUG = "GestureController";
     public static final String OBJECT_DEBUG = "GameObject";
 
     //styles
-    public static final Color BLUE_500 = parseColor("2196F3");
-    public static final Color RED_500  = parseColor("F44336");
+    public static final Color BLUE_500 = new Color(0x2196f3ff);
+    public static final Color RED_500  = new Color(0xf44336ff);
 
     public static Color parseColor(String hex) {
         String s1 = hex.substring(0, 2);

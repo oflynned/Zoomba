@@ -16,33 +16,26 @@ public class Behaviour {
          * 75% chance of a reflection on colliding with a wall
          * 25% chance of a teleportation through the wall
          */
-        switch(new Random().nextInt(4)) {
-            case 0:
-            case 1:
-            case 2:
-                collideWall(direction, circle);
-                break;
-            case 3:
-                passThroughWall(direction, circle);
-                break;
-        }
+        int rand = new Random().nextInt(10);
+        if (rand < 10) collideWall(direction, circle);
+        else passThroughWall(direction, circle);
     }
 
     public static void passThroughWall(Direction direction, Circle circle) {
         if(direction.equals(Direction.Left)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT PASS THROUGH");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT PASS THROUGH (" + circle.getId() + ")");
             circle.setX(GameScreen.width - 2*circle.getRadius() - 10);
             circle.setY(GameScreen.height - circle.getY() - 10);
         } else if (direction.equals(Direction.Top)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP PASS THROUGH");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP PASS THROUGH (" + circle.getId() + ")");
             circle.setX(GameScreen.width - circle.getX());
             circle.setY(circle.getRadius() + 10);
         } else if(direction.equals(Direction.Right)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT PASS THROUGH");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT PASS THROUGH (" + circle.getId() + ")");
             circle.setX(2*circle.getRadius() + 10);
             circle.setY(GameScreen.height - circle.getY() - 10);
         } else if(direction.equals(Direction.Bottom)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM PASS THROUGH");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM PASS THROUGH (" + circle.getId() + ")");
             circle.setX(GameScreen.width - circle.getX() - 10);
             circle.setY(GameScreen.height - circle.getRadius() - 10);
         }
@@ -50,23 +43,23 @@ public class Behaviour {
 
     public static void collideWall(Direction direction, Circle circle) {
         if(direction.equals(Direction.Left)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT COLLISION");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT COLLISION (" + circle.getId() + ")");
             circle.setX(circle.getX() + 10);
             circle.setOrientation(getVerticalBounce(circle.getOrientation()));
         } else if(direction.equals(Direction.Right)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT COLLISION");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT COLLISION (" + circle.getId() + ")");
             circle.setX(circle.getX() - 10);
             circle.setOrientation(getVerticalBounce(circle.getOrientation()));
         } else if (direction.equals(Direction.Top)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP COLLISION");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP COLLISION (" + circle.getId() + ")");
             circle.setY(circle.getY() - 10);
             circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
         } else if (direction.equals(Direction.Bottom)) {
-            Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM COLLISION");
+            Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM COLLISION (" + circle.getId() + ")");
             circle.setY(circle.getY() + 10);
             circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
         }
-        Gdx.app.log(Constants.PHYSICS_DEBUG, circle.getOrientation() + " degrees");
+        Gdx.app.log(Constants.PHYSICS_ATTRIBUTE_DEBUG, circle.getOrientation() + " degrees");
     }
 
     public static float getVerticalBounce(float angle) {

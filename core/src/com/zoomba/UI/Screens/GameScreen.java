@@ -1,6 +1,8 @@
 package com.zoomba.UI.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -11,13 +13,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.zoomba.GameObjects.ObjectFactory.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Factory;
@@ -25,6 +25,7 @@ import com.zoomba.GameObjects.ObjectFactory.FactoryTypes;
 import com.zoomba.GameObjects.ObjectFactory.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.ObjectTypes;
 import com.zoomba.GameObjects.ObjectFactory.Producer;
+import com.zoomba.GameObjects.UI.UI;
 import com.zoomba.Services.Constants;
 import com.zoomba.Zoomba;
 
@@ -37,61 +38,37 @@ public class GameScreen implements Screen {
     private Zoomba zoomba;
     private ArrayList<Circle> slowCircles;
 
-    private Stage mainStage, uiStage;
-    Skin skin;
+    private Stage mainStage;
+    private Skin skin;
     private OrthographicCamera worldCamera;
     private GestureController gestureController = new GestureController();
 
     public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
     private float viewportWidth = width, viewportHeight = height;
     private Vector3 cameraCentre = new Vector3(width, height, 0f);
+
+    UI ui;
+    InputMultiplexer inputMultiplexer = new InputMultiplexer();
     
     public GameScreen(Zoomba zoomba) {
         this.zoomba = zoomba;
 
         worldCamera = new OrthographicCamera();
         mainStage = new Stage(new FitViewport(viewportWidth, viewportHeight));
-        uiStage = new Stage();
-        skin = new Skin();
-
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.fill();
-        skin.add("white", new Texture(pixmap));
-        skin.add("default", new BitmapFont());
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        skin.add("default", textButtonStyle);
-
-        Table table = new Table();
-        table.setFillParent(true);
-        uiStage.addActor(table);
-
-        final TextButton button = new TextButton("Click here!", skin);
-        table.add(button);
-
-        button.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                button.setText("Clicked!");
-                System.out.println(button.isChecked());
-            }
-        });
-
-        table.add(new Image(skin.newDrawable("white", Color.RED))).size(64);
-
         worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
 
-        GestureDetector gestureDetector = new GestureDetector(20, 0.5f, 2, 0.15f, gestureController);
-        Gdx.input.setInputProcessor(gestureDetector);
+        ui = new UI(viewportWidth, viewportHeight);
+        populateLevel(1);
 
+        inputMultiplexer.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, gestureController));
+        inputMultiplexer.addProcessor(ui);
+        Gdx.input.setInputProcessor(inputMultiplexer);
+    }
+
+    private void populateLevel(int difficulty) {
         Factory circleFactory = Producer.getFactory(FactoryTypes.Circle);
         slowCircles = new ArrayList<Circle>();
-        for (int i = 0; i < Constants.CIRCLE_AMOUNT; i++) {
+        for (int i = 0; i < difficulty * Constants.CIRCLE_AMOUNT; i++) {
             assert circleFactory != null;
             slowCircles.add(circleFactory.generateCircle(ObjectTypes.Slow, Constants.CIRCLE_RADIUS,
                     GameObject.getRandomOrientation(), Constants.RED_500, Constants.CIRCLE_VELOCITY));
@@ -126,13 +103,13 @@ public class GameScreen implements Screen {
         worldCamera.update();
         worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
 
-        uiStage.act(Math.min(Gdx.graphics.getDeltaTime(), 1/30f));
-        uiStage.draw();
+        ui.onUpdate(30, 0);
+        ui.onDraw();
     }
 
     @Override
     public void resize(int width, int height) {
-
+        mainStage.getViewport().update(width, height, false);
     }
 
     @Override
@@ -152,9 +129,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        uiStage.dispose();
         mainStage.dispose();
         skin.dispose();
+        ui.onDispose();
     }
 
     public Zoomba getZoomba() {
@@ -165,7 +142,7 @@ public class GameScreen implements Screen {
         return slowCircles;
     }
 
-    class GestureController implements GestureDetector.GestureListener {
+    class GestureController implements GestureDetector.GestureListener, InputProcessor {
         float velX, velY;
         boolean flinging = false;
         float initialScale = 1;
@@ -246,6 +223,46 @@ public class GameScreen implements Screen {
         @Override
         public void pinchStop () {
 
+        }
+
+        @Override
+        public boolean keyDown(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyTyped(char character) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            return false;
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            return false;
+        }
+
+        @Override
+        public boolean scrolled(int amount) {
+            return false;
         }
     }
 
