@@ -11,8 +11,6 @@ import sun.misc.FloatingDecimal;
  * Created by ed on 09/08/16.
  */
 public abstract class GameObject {
-    float width = Gdx.graphics.getWidth();
-    float height = Gdx.graphics.getHeight();
     float x, y, radius;
     Color color;
     float orientation;
@@ -79,14 +77,6 @@ public abstract class GameObject {
 
     public static float getRandomOrientation() {
         return new Random().nextInt(360);
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public float getHeight() {
-        return height;
     }
 
     public Color getColor() {

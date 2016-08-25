@@ -2,11 +2,22 @@ package com.zoomba.UI.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.zoomba.GameObjects.ObjectFactory.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Factory;
@@ -26,19 +37,52 @@ public class GameScreen implements Screen {
     private Zoomba zoomba;
     private ArrayList<Circle> slowCircles;
 
-    private Stage stage;
+    private Stage mainStage, uiStage;
+    Skin skin;
     private OrthographicCamera worldCamera;
     private GestureController gestureController = new GestureController();
 
     public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
     private float viewportWidth = width, viewportHeight = height;
-    private Vector2 cameraCentre = new Vector2(width, height);
+    private Vector3 cameraCentre = new Vector3(width, height, 0f);
     
     public GameScreen(Zoomba zoomba) {
         this.zoomba = zoomba;
 
         worldCamera = new OrthographicCamera();
-        stage = new Stage(new FitViewport(viewportWidth, viewportHeight));
+        mainStage = new Stage(new FitViewport(viewportWidth, viewportHeight));
+        uiStage = new Stage();
+        skin = new Skin();
+
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.fill();
+        skin.add("white", new Texture(pixmap));
+        skin.add("default", new BitmapFont());
+
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
+        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
+        textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
+        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
+        textButtonStyle.font = skin.getFont("default");
+        skin.add("default", textButtonStyle);
+
+        Table table = new Table();
+        table.setFillParent(true);
+        uiStage.addActor(table);
+
+        final TextButton button = new TextButton("Click here!", skin);
+        table.add(button);
+
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                button.setText("Clicked!");
+                System.out.println(button.isChecked());
+            }
+        });
+
+        table.add(new Image(skin.newDrawable("white", Color.RED))).size(64);
 
         worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
 
@@ -52,9 +96,6 @@ public class GameScreen implements Screen {
             slowCircles.add(circleFactory.generateCircle(ObjectTypes.Slow, Constants.CIRCLE_RADIUS,
                     GameObject.getRandomOrientation(), Constants.RED_500, Constants.CIRCLE_VELOCITY));
         }
-        for (Circle circle : slowCircles) {
-            Gdx.app.log(Constants.GAME_SCREEN_DEBUG, circle.getClass() + " " + circle.getX() + " " + circle.getY());
-        }
     }
 
     @Override
@@ -67,8 +108,8 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(33f / 255f, 150f / 255f, 243f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stage.getViewport().apply();
-        stage.draw();
+        mainStage.getViewport().apply();
+        mainStage.draw();
         gestureController.update();
         getZoomba().getSpriteBatch().setProjectionMatrix(worldCamera.combined);
 
@@ -81,8 +122,12 @@ public class GameScreen implements Screen {
             getZoomba().getSpriteBatch().end();
         }
 
-        stage.getViewport().update((int) viewportWidth, (int) viewportHeight, false);
+        mainStage.getViewport().update((int) viewportWidth, (int) viewportHeight, false);
+        worldCamera.update();
         worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
+
+        uiStage.act(Math.min(Gdx.graphics.getDeltaTime(), 1/30f));
+        uiStage.draw();
     }
 
     @Override
@@ -107,7 +152,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        uiStage.dispose();
+        mainStage.dispose();
+        skin.dispose();
     }
 
     public Zoomba getZoomba() {
@@ -131,13 +178,11 @@ public class GameScreen implements Screen {
 
         @Override
         public boolean tap (float x, float y, int count, int button) {
-            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "tap at " + x + ", " + y + ", count: " + count);
             return false;
         }
 
         @Override
         public boolean longPress (float x, float y) {
-            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "long press at " + x + ", " + y);
             return false;
         }
 
@@ -159,7 +204,6 @@ public class GameScreen implements Screen {
 
         @Override
         public boolean panStop (float x, float y, int pointer, int button) {
-            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "pan stop at " + x + ", " + y);
             return false;
         }
 
@@ -169,10 +213,10 @@ public class GameScreen implements Screen {
             worldCamera.zoom = initialScale / ratio;
             Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, worldCamera.zoom + " zoom");
 
-            viewportWidth = width * worldCamera.zoom;
-            viewportHeight = height * worldCamera.zoom;
+            viewportWidth = GameScreen.width * worldCamera.zoom;
+            viewportHeight = GameScreen.height * worldCamera.zoom;
 
-            if (viewportHeight < height || viewportWidth < width) {
+            if (viewportHeight < GameScreen.height || GameScreen.width < width) {
                 viewportWidth = width;
                 viewportHeight = height;
             }

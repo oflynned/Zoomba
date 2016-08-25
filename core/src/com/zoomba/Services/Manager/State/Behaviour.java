@@ -12,32 +12,38 @@ import java.util.Random;
  */
 public class Behaviour {
     public static void generateStateTransition(Direction direction, Circle circle) {
-        collideWall(direction, circle);
-
-        /*switch(new Random().nextInt(1)) {
+        /**
+         * 75% chance of a reflection on colliding with a wall
+         * 25% chance of a teleportation through the wall
+         */
+        switch(new Random().nextInt(4)) {
             case 0:
-                collideWall(direction, circle);
             case 1:
+            case 2:
+                collideWall(direction, circle);
+                break;
+            case 3:
                 passThroughWall(direction, circle);
-        }*/
+                break;
+        }
     }
 
     public static void passThroughWall(Direction direction, Circle circle) {
         if(direction.equals(Direction.Left)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT PASS THROUGH");
             circle.setX(GameScreen.width - 2*circle.getRadius() - 10);
-            circle.setY(GameScreen.height - circle.getY());
+            circle.setY(GameScreen.height - circle.getY() - 10);
         } else if (direction.equals(Direction.Top)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP PASS THROUGH");
             circle.setX(GameScreen.width - circle.getX());
             circle.setY(circle.getRadius() + 10);
         } else if(direction.equals(Direction.Right)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT PASS THROUGH");
-            circle.setX(10);
-            circle.setY(GameScreen.height - circle.getY());
+            circle.setX(2*circle.getRadius() + 10);
+            circle.setY(GameScreen.height - circle.getY() - 10);
         } else if(direction.equals(Direction.Bottom)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM PASS THROUGH");
-            circle.setX(GameScreen.width - circle.getX());
+            circle.setX(GameScreen.width - circle.getX() - 10);
             circle.setY(GameScreen.height - circle.getRadius() - 10);
         }
     }
@@ -76,9 +82,39 @@ public class Behaviour {
         double dy = circle1.getY() - circle2.getY();
         double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 
+        //is collision
         if(distance < circle1.getRadius() + circle2.getRadius()) {
-            //is collision
+            determineCollision(circle1, circle2);
+        }
+    }
 
+    public static void determineCollision(Circle circle1, Circle circle2) {
+        if(circle1.getX() < circle2.getX()) {
+            //1o2o
+            if(circle1.getY() < circle2.getY()) {
+                //2o
+                //1o
+                circle1.setOrientation(getHorizontalBounce(circle1.getOrientation()));
+                circle2.setOrientation(getHorizontalBounce(circle2.getOrientation()));
+            } else {
+                //1o
+                //2o
+                circle1.setOrientation(getHorizontalBounce(circle1.getOrientation()));
+                circle2.setOrientation(getHorizontalBounce(circle2.getOrientation()));
+            }
+        } else {
+            //2o1o
+            if(circle1.getY() < circle2.getY()) {
+                //2o
+                //1o
+                circle1.setOrientation(getVerticalBounce(circle1.getOrientation()));
+                circle2.setOrientation(getVerticalBounce(circle2.getOrientation()));
+            } else {
+                //1o
+                //2o
+                circle1.setOrientation(getVerticalBounce(circle1.getOrientation()));
+                circle2.setOrientation(getVerticalBounce(circle2.getOrientation()));
+            }
         }
     }
 }
