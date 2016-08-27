@@ -1,8 +1,8 @@
 package com.zoomba.GameObjects.ObjectFactory;
 
-import com.badlogic.gdx.graphics.Color;
 import com.zoomba.GameObjects.Circles.Fast;
 import com.zoomba.GameObjects.Circles.Slow;
+import com.zoomba.Services.Constants;
 import com.zoomba.UI.Screens.GameScreen;
 
 import java.util.Random;
@@ -15,15 +15,14 @@ public class CircleFactory extends Factory {
     private int id = 0;
 
     @Override
-    public Circle generateCircle(ObjectTypes objectType, float radius, float orientation,
-                                 Color color, float velocity) {
+    public Circle generateCircle(ObjectTypes objectType) {
         float x = generateCoords(GameScreen.width);
         float y = generateCoords(GameScreen.height);
 
         if (objectType.equals(ObjectTypes.Slow))
-            return new Slow(x, y, radius, orientation, color, velocity, generateId());
+            return new Slow(x, y, Constants.CIRCLE_RADIUS, GameObject.getRandomOrientation(), generateId());
         else if (objectType.equals(ObjectTypes.Fast))
-            return new Fast(x, y, radius, orientation, color, velocity, generateId());
+            return new Fast(x, y, Constants.CIRCLE_RADIUS, GameObject.getRandomOrientation(), generateId());
         else return null;
     }
 

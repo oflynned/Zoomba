@@ -3,7 +3,6 @@ package com.zoomba.UI.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.zoomba.GameObjects.ObjectFactory.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Factory;
 import com.zoomba.GameObjects.ObjectFactory.FactoryTypes;
-import com.zoomba.GameObjects.ObjectFactory.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.ObjectTypes;
 import com.zoomba.GameObjects.ObjectFactory.Producer;
 import com.zoomba.GameObjects.UI.ScoreUI;
@@ -24,13 +22,14 @@ import com.zoomba.Services.Manager.State.Manager;
 import com.zoomba.Zoomba;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by ed on 09/08/16.
  */
 public class GameScreen implements Screen {
     private Zoomba zoomba;
-    private ArrayList<Circle> spawnedCircles;
+    private ArrayList<Circle> spawnedCircles = new ArrayList<Circle>();
 
     private Stage mainStage;
     private OrthographicCamera worldCamera;
@@ -40,7 +39,7 @@ public class GameScreen implements Screen {
     private ScoreUI scoreUi;
 
     public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
-    
+
     public GameScreen(Zoomba zoomba) {
         this.zoomba = zoomba;
 
@@ -57,23 +56,34 @@ public class GameScreen implements Screen {
     public void spawn() {
         Manager.getInstance().setCurrentEpoch(Constants.GAME_LENGTH);
         Manager.getInstance().setState(GameState.Ongoing);
-        Manager.getInstance().setDifficulty(1);
-        Manager.getInstance().setPoints(0);
+        Manager.getInstance().setPoints(Manager.getInstance().getPoints() +
+                Manager.getInstance().getDifficulty() * 10);
+        Manager.getInstance().setDifficulty(Manager.getInstance().getDifficulty() + 1);
         populateLevel();
         Gdx.app.log("Difficulty", String.valueOf(Manager.getInstance().getDifficulty()));
     }
 
-    private void spawnCircles(Factory circleFactory, ObjectTypes objectType, Color color, float velocity) {
-        for (int i = 0; i < Constants.CIRCLE_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
-            spawnedCircles.add(circleFactory.generateCircle(objectType, Constants.CIRCLE_RADIUS,
-                    GameObject.getRandomOrientation(), color, velocity));
-        }
-    }
-
     private void populateLevel() {
-        spawnedCircles = new ArrayList<Circle>();
-        spawnCircles(Producer.getFactory(FactoryTypes.Circle), ObjectTypes.Fast,
-                Constants.YELLOW_500, Constants.FAST_VELOCITY);
+        Factory circleFactory = Producer.getFactory(FactoryTypes.Circle);
+        assert circleFactory != null;
+
+        int slowCircles = new Random().nextInt(Manager.getInstance().getDifficulty());
+        int fastCircles = Manager.getInstance().getDifficulty() - slowCircles;
+
+        spawnedCircles.clear();
+
+        if (Manager.getInstance().getDifficulty() < Constants.THRESHOLD) {
+            for (int i = 0; i < Constants.CIRCLE_INITIAL_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
+                spawnedCircles.add(circleFactory.generateCircle(ObjectTypes.Slow));
+            }
+        } else {
+            for (int j = 0; j < slowCircles; j++) {
+                spawnedCircles.add(circleFactory.generateCircle(ObjectTypes.Slow));
+            }
+            for (int k = 0; k < fastCircles; k++) {
+                spawnedCircles.add(circleFactory.generateCircle(ObjectTypes.Fast));
+            }
+        }
     }
 
     @Override
@@ -84,7 +94,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         Manager.getInstance().countdown(getCircles().size());
-        if(Manager.getInstance().getState().equals(GameState.Loss)) {
+        if (Manager.getInstance().getState().equals(GameState.Loss)) {
             getZoomba().setScreen(new EndGameScreen(getZoomba()));
         } else if (Manager.getInstance().getState().equals(GameState.Win)) {
             spawn();
@@ -112,7 +122,8 @@ public class GameScreen implements Screen {
         worldCamera.update();
         worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
 
-        scoreUi.onUpdate(Manager.getInstance().getCurrentEpoch() / 100, 0);
+        scoreUi.onUpdate(Manager.getInstance().getCurrentEpoch() / 100,
+                Manager.getInstance().getPoints());
         scoreUi.onDraw();
     }
 
@@ -155,24 +166,24 @@ public class GameScreen implements Screen {
         boolean flinging = false;
         float initialScale = 1;
 
-        public boolean touchDown (float x, float y, int pointer, int button) {
+        public boolean touchDown(float x, float y, int pointer, int button) {
             flinging = false;
             initialScale = worldCamera.zoom;
             return false;
         }
 
         @Override
-        public boolean tap (float x, float y, int count, int button) {
+        public boolean tap(float x, float y, int count, int button) {
             return false;
         }
 
         @Override
-        public boolean longPress (float x, float y) {
+        public boolean longPress(float x, float y) {
             return false;
         }
 
         @Override
-        public boolean fling (float velocityX, float velocityY, int button) {
+        public boolean fling(float velocityX, float velocityY, int button) {
             Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "fling " + velocityX + ", " + velocityY);
             flinging = true;
             velX = worldCamera.zoom * velocityX * 0.5f;
@@ -181,19 +192,19 @@ public class GameScreen implements Screen {
         }
 
         @Override
-        public boolean pan (float x, float y, float deltaX, float deltaY) {
+        public boolean pan(float x, float y, float deltaX, float deltaY) {
             Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, "pan at " + x + ", " + y);
             worldCamera.position.add(-deltaX * worldCamera.zoom, deltaY * worldCamera.zoom, 0);
             return false;
         }
 
         @Override
-        public boolean panStop (float x, float y, int pointer, int button) {
+        public boolean panStop(float x, float y, int pointer, int button) {
             return false;
         }
 
         @Override
-        public boolean zoom (float originalDistance, float currentDistance) {
+        public boolean zoom(float originalDistance, float currentDistance) {
             if (viewportHeight < GameScreen.height || GameScreen.width < width) {
                 viewportWidth = width;
                 viewportHeight = height;
@@ -211,7 +222,7 @@ public class GameScreen implements Screen {
         }
 
         @Override
-        public boolean pinch (Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
+        public boolean pinch(Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
             cameraCentre.x = ((firstPointer.x + secondPointer.x) / 2) % viewportWidth;
             cameraCentre.y = ((firstPointer.y + secondPointer.y) / 2) % viewportHeight;
 
@@ -219,7 +230,7 @@ public class GameScreen implements Screen {
             return false;
         }
 
-        public void update () {
+        public void update() {
             if (flinging) {
                 velX *= 0.98f;
                 velY *= 0.98f;
@@ -231,7 +242,7 @@ public class GameScreen implements Screen {
         }
 
         @Override
-        public void pinchStop () {
+        public void pinchStop() {
 
         }
 

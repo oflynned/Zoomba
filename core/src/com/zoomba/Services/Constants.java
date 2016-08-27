@@ -7,14 +7,16 @@ import com.badlogic.gdx.graphics.Color;
  */
 public class Constants {
     public static final float CIRCLE_RADIUS = 50;
-    public static final int CIRCLE_AMOUNT = 2;
+    public static final int CIRCLE_INITIAL_AMOUNT = 2;
 
     public static final float SLOW_VELOCITY = 2;
-    public static final int SLOW_POINTS = 5;
-    public static final float FAST_VELOCITY = 20;
+    public static final int SLOW_POINTS = (int) (SLOW_VELOCITY * 10);
+    public static final float FAST_VELOCITY = 6;
+    public static final int FAST_POINTS = (int) (FAST_VELOCITY * 10);
+    public static final int THRESHOLD = 4;
 
     public static final int ONE_SECOND = 100;
-    public static final int GAME_LENGTH = 30 * ONE_SECOND;
+    public static final int GAME_LENGTH = 5 * ONE_SECOND;
 
     //multisampling
     public static final int ANTIALIASING = 8;

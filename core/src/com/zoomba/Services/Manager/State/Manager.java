@@ -25,10 +25,8 @@ public class Manager {
             currentEpoch--;
             state = GameState.Ongoing;
         } else {
-            //should be set to win or loss depending on entityCount's value
-            //win being reset and increment difficulty
-            //loss being move to end game screen
-            state = entityCount > 0 ? GameState.Loss : GameState.Win;
+            // loss : win
+            state = entityCount > 0 ? GameState.Win : GameState.Win;
         }
     }
 

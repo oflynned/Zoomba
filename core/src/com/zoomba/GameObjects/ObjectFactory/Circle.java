@@ -42,7 +42,8 @@ public abstract class Circle extends GameObject {
     }
 
     public void onCollision() {
-        Gdx.app.log(Constants.OBJECT_DEBUG, "onCollision() @ (" + getX() + "," + getY() + ") with id " + getId());
+        Gdx.app.log(Constants.OBJECT_DEBUG, "onCollision() @ (" + getX() + "," + getY() +
+                ") with id " + getId() + " (" + getClass() + ")");
         if(isLeftCollision()) {
             Behaviour.generateStateTransition(Direction.Left, this);
         } else if (isTopCollision()) {
