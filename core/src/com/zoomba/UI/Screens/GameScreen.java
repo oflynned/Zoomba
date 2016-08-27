@@ -1,23 +1,14 @@
 package com.zoomba.UI.Screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.zoomba.GameObjects.ObjectFactory.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Factory;
@@ -25,8 +16,10 @@ import com.zoomba.GameObjects.ObjectFactory.FactoryTypes;
 import com.zoomba.GameObjects.ObjectFactory.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.ObjectTypes;
 import com.zoomba.GameObjects.ObjectFactory.Producer;
-import com.zoomba.GameObjects.UI.UI;
+import com.zoomba.GameObjects.UI.ScoreUI;
 import com.zoomba.Services.Constants;
+import com.zoomba.Services.Manager.State.GameState;
+import com.zoomba.Services.Manager.State.Manager;
 import com.zoomba.Zoomba;
 
 import java.util.ArrayList;
@@ -39,16 +32,13 @@ public class GameScreen implements Screen {
     private ArrayList<Circle> slowCircles;
 
     private Stage mainStage;
-    private Skin skin;
     private OrthographicCamera worldCamera;
     private GestureController gestureController = new GestureController();
-
-    public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
     private float viewportWidth = width, viewportHeight = height;
     private Vector3 cameraCentre = new Vector3(width, height, 0f);
+    private ScoreUI scoreUi;
 
-    UI ui;
-    InputMultiplexer inputMultiplexer = new InputMultiplexer();
+    public static float width = Gdx.graphics.getWidth(), height = Gdx.graphics.getHeight();
     
     public GameScreen(Zoomba zoomba) {
         this.zoomba = zoomba;
@@ -57,21 +47,28 @@ public class GameScreen implements Screen {
         mainStage = new Stage(new FitViewport(viewportWidth, viewportHeight));
         worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
 
-        ui = new UI(viewportWidth, viewportHeight);
-        populateLevel(1);
+        scoreUi = new ScoreUI(viewportWidth, viewportHeight);
+        Gdx.input.setInputProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, gestureController));
 
-        inputMultiplexer.addProcessor(new GestureDetector(20, 0.5f, 2, 0.15f, gestureController));
-        inputMultiplexer.addProcessor(ui);
-        Gdx.input.setInputProcessor(inputMultiplexer);
+        spawn();
     }
 
-    private void populateLevel(int difficulty) {
+    public void spawn() {
+        Manager.getInstance().setCurrentEpoch(Constants.GAME_LENGTH);
+        Manager.getInstance().setState(GameState.Ongoing);
+        Manager.getInstance().setDifficulty(1);
+        Manager.getInstance().setPoints(0);
+        populateLevel();
+        Gdx.app.log("Difficulty", String.valueOf(Manager.getInstance().getDifficulty()));
+    }
+
+    private void populateLevel() {
         Factory circleFactory = Producer.getFactory(FactoryTypes.Circle);
         slowCircles = new ArrayList<Circle>();
-        for (int i = 0; i < difficulty * Constants.CIRCLE_AMOUNT; i++) {
+        for (int i = 0; i < Constants.CIRCLE_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
             assert circleFactory != null;
             slowCircles.add(circleFactory.generateCircle(ObjectTypes.Slow, Constants.CIRCLE_RADIUS,
-                    GameObject.getRandomOrientation(), Constants.RED_500, Constants.CIRCLE_VELOCITY));
+                    GameObject.getRandomOrientation(), Constants.RED_500, Constants.SLOW_VELOCITY));
         }
     }
 
@@ -82,6 +79,13 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        Manager.getInstance().countdown(getCircles().size());
+        if(Manager.getInstance().getState().equals(GameState.Loss)) {
+            getZoomba().setScreen(new EndGameScreen(getZoomba()));
+        } else if (Manager.getInstance().getState().equals(GameState.Win)) {
+            spawn();
+        }
+
         Gdx.gl.glClearColor(33f / 255f, 150f / 255f, 243f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -93,6 +97,7 @@ public class GameScreen implements Screen {
         for (Circle circle : getCircles()) {
             getZoomba().getSpriteBatch().begin();
 
+            //Behaviour.circleCollision(getCircles());
             circle.onMove();
             circle.onDraw(getZoomba().getSpriteBatch(), getZoomba().getShapeRenderer());
 
@@ -103,8 +108,8 @@ public class GameScreen implements Screen {
         worldCamera.update();
         worldCamera.position.set(cameraCentre.x / 2, cameraCentre.y / 2, 0);
 
-        ui.onUpdate(30, 0);
-        ui.onDraw();
+        scoreUi.onUpdate(Manager.getInstance().getCurrentEpoch() / 100, 0);
+        scoreUi.onDraw();
     }
 
     @Override
@@ -130,8 +135,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         mainStage.dispose();
-        skin.dispose();
-        ui.onDispose();
+        scoreUi.onDispose();
     }
 
     public Zoomba getZoomba() {
@@ -186,26 +190,28 @@ public class GameScreen implements Screen {
 
         @Override
         public boolean zoom (float originalDistance, float currentDistance) {
-            float ratio = originalDistance / currentDistance;
-            worldCamera.zoom = initialScale / ratio;
-            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, worldCamera.zoom + " zoom");
-
-            viewportWidth = GameScreen.width * worldCamera.zoom;
-            viewportHeight = GameScreen.height * worldCamera.zoom;
-
             if (viewportHeight < GameScreen.height || GameScreen.width < width) {
                 viewportWidth = width;
                 viewportHeight = height;
+            } else {
+                float ratio = originalDistance / currentDistance;
+                worldCamera.zoom = initialScale / ratio;
+                Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, worldCamera.zoom + " zoom");
+
+                viewportWidth = GameScreen.width * worldCamera.zoom;
+                viewportHeight = GameScreen.height * worldCamera.zoom;
             }
 
-            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, viewportWidth + " " + viewportHeight);
+            Gdx.app.log(Constants.GESTURE_CONTROLLER_DEBUG, viewportWidth + " " + viewportHeight + ", ZOOM " + worldCamera.zoom);
             return false;
         }
 
         @Override
         public boolean pinch (Vector2 initialFirstPointer, Vector2 initialSecondPointer, Vector2 firstPointer, Vector2 secondPointer) {
-            cameraCentre.x = (firstPointer.x + secondPointer.x) / 2;
-            cameraCentre.y = (firstPointer.y + secondPointer.y) / 2;
+            cameraCentre.x = ((firstPointer.x + secondPointer.x) / 2) % viewportWidth;
+            cameraCentre.y = ((firstPointer.y + secondPointer.y) / 2) % viewportHeight;
+
+            Gdx.app.log("CameraDebug", String.valueOf(cameraCentre));
             return false;
         }
 

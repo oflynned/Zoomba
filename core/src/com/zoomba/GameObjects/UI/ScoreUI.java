@@ -1,12 +1,10 @@
 package com.zoomba.GameObjects.UI;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.stbtt.TrueTypeFontFactory;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -14,20 +12,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-import sun.font.TrueTypeFont;
-
 /**
  * Created by ed on 25/08/16.
  */
-public class UI extends UIObject implements InputProcessor {
-
+public class ScoreUI extends UIObject {
     private Stage uiStage;
     private Skin skin;
     private Pixmap pixmap;
     private Table table;
     private TextButton scoreText, scoreValue, timeText, timeValue;
 
-    public UI(float width, float height) {
+    public ScoreUI(float width, float height) {
         uiStage = new Stage(new FitViewport(width, height));
         skin = new Skin();
 
@@ -67,46 +62,6 @@ public class UI extends UIObject implements InputProcessor {
         table.add(timeValue);
 
         uiStage.addActor(table);
-    }
-
-    @Override
-    public boolean keyDown(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(int amount) {
-        return false;
     }
 
     @Override

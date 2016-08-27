@@ -3,6 +3,7 @@ package com.zoomba;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zoomba.Services.Manager.State.Manager;
 import com.zoomba.UI.Screens.GameScreen;
 
 public class Zoomba extends Game {

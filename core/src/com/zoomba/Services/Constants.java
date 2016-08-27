@@ -7,11 +7,17 @@ import com.badlogic.gdx.graphics.Color;
  */
 public class Constants {
     public static final float CIRCLE_RADIUS = 50;
-    public static final float CIRCLE_VELOCITY = 5;
-    public static final int CIRCLE_AMOUNT = 10;
+    public static final int CIRCLE_AMOUNT = 2;
+
+    public static final float SLOW_VELOCITY = 2;
+    public static final int SLOW_POINTS = 5;
+    public static final float FAST_VELOCITY = 12;
+
+    public static final int ONE_SECOND = 100;
+    public static final int GAME_LENGTH = ONE_SECOND;
 
     //multisampling
-    public static final int ANTIALIASING = 4;
+    public static final int ANTIALIASING = 8;
 
     //debug labels
     public static final String PHYSICS_DEBUG = "PhysicsDebug";
@@ -23,6 +29,7 @@ public class Constants {
     //styles
     public static final Color BLUE_500 = new Color(0x2196f3ff);
     public static final Color RED_500  = new Color(0xf44336ff);
+    public static final Color YELLOW_500 = new Color(0xffeb3bff);
 
     public static Color parseColor(String hex) {
         String s1 = hex.substring(0, 2);
