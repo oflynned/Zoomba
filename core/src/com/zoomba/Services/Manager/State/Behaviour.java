@@ -1,7 +1,7 @@
 package com.zoomba.Services.Manager.State;
 
 import com.badlogic.gdx.Gdx;
-import com.zoomba.GameObjects.ObjectFactory.Circle;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.Services.Constants;
 import com.zoomba.UI.Screens.GameScreen;
 

@@ -1,7 +1,8 @@
 package com.zoomba.Services.Manager.State;
 
+import com.zoomba.GameObjects.Circles.Fast;
 import com.zoomba.GameObjects.Circles.Slow;
-import com.zoomba.GameObjects.ObjectFactory.Circle;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.Services.Constants;
 
 /**
@@ -26,13 +27,15 @@ public class Manager {
             state = GameState.Ongoing;
         } else {
             // loss : win
-            state = entityCount > 0 ? GameState.Win : GameState.Win;
+            state = entityCount > 0 ? GameState.Loss : GameState.Win;
         }
     }
 
     public void incrementScore(Circle circle) {
         if (circle.getClass().equals(Slow.class)) {
             points += Constants.SLOW_POINTS;
+        } else if(circle.getClass().equals(Fast.class)) {
+            points += Constants.FAST_POINTS;
         }
     }
 

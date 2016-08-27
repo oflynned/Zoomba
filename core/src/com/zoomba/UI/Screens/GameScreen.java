@@ -10,11 +10,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.zoomba.GameObjects.ObjectFactory.Circle;
-import com.zoomba.GameObjects.ObjectFactory.Factory;
-import com.zoomba.GameObjects.ObjectFactory.FactoryTypes;
-import com.zoomba.GameObjects.ObjectFactory.ObjectTypes;
-import com.zoomba.GameObjects.ObjectFactory.Producer;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
+import com.zoomba.GameObjects.ObjectFactory.Types.FactoryTypes;
+import com.zoomba.GameObjects.ObjectFactory.Types.ObjectTypes;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Producer;
 import com.zoomba.GameObjects.UI.ScoreUI;
 import com.zoomba.Services.Constants;
 import com.zoomba.Services.Manager.State.GameState;
@@ -74,14 +74,14 @@ public class GameScreen implements Screen {
 
         if (Manager.getInstance().getDifficulty() < Constants.THRESHOLD) {
             for (int i = 0; i < Constants.CIRCLE_INITIAL_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
-                spawnedCircles.add(circleFactory.generateCircle(ObjectTypes.Slow));
+                spawnedCircles.add(circleFactory.generate(ObjectTypes.Slow));
             }
         } else {
             for (int j = 0; j < slowCircles; j++) {
-                spawnedCircles.add(circleFactory.generateCircle(ObjectTypes.Slow));
+                spawnedCircles.add(circleFactory.generate(ObjectTypes.Slow));
             }
             for (int k = 0; k < fastCircles; k++) {
-                spawnedCircles.add(circleFactory.generateCircle(ObjectTypes.Fast));
+                spawnedCircles.add(circleFactory.generate(ObjectTypes.Fast));
             }
         }
     }

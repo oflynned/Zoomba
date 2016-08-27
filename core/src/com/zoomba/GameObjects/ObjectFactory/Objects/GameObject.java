@@ -1,4 +1,4 @@
-package com.zoomba.GameObjects.ObjectFactory;
+package com.zoomba.GameObjects.ObjectFactory.Objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -11,11 +11,9 @@ import sun.misc.FloatingDecimal;
  * Created by ed on 09/08/16.
  */
 public abstract class GameObject {
-    double x, y;
-    float radius;
+    double x, y, velocity;
+    float radius, orientation;
     Color color;
-    float orientation;
-    double velocity;
     int id;
 
     public GameObject(float x, float y, float radius, float orientation, Color color, float velocity, int id) {
@@ -50,16 +48,14 @@ public abstract class GameObject {
         return velocity;
     }
 
-    public void setVelocity(double velocity) {
-        this.velocity = velocity;
-    }
-
     public double getX() {
         return x;
     }
+
     public double getY() {
         return y;
     }
+
     public float getRadius() {
         return radius;
     }

@@ -1,4 +1,4 @@
-package com.zoomba.GameObjects.ObjectFactory;
+package com.zoomba.GameObjects.ObjectFactory.Types;
 
 /**
  * Created by ed on 20/08/16.

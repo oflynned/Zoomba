@@ -1,8 +1,7 @@
-package com.zoomba.GameObjects.ObjectFactory;
+package com.zoomba.GameObjects.ObjectFactory.Objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zoomba.Services.Constants;
 import com.zoomba.Services.Manager.State.Behaviour;
@@ -22,7 +21,7 @@ public abstract class Circle extends GameObject {
         setY(GameObject.getRandomY());
         setOrientation(GameObject.getRandomOrientation());
         Gdx.app.log(Constants.OBJECT_DEBUG, "onSpawn() @ (" + getX() + ", " + getY() + ") with vels " +
-                getXVel() + " " + getYVel() + ", id: " + getId());
+                getXVel() + " " + getYVel() + ", id: " + getId() + " (" + getClass() + ")");
     }
 
     public void onDraw(ShapeRenderer renderer) {

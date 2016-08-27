@@ -1,7 +1,11 @@
-package com.zoomba.GameObjects.ObjectFactory;
+package com.zoomba.GameObjects.ObjectFactory.Factories;
 
 import com.zoomba.GameObjects.Circles.Fast;
 import com.zoomba.GameObjects.Circles.Slow;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
+import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
+import com.zoomba.GameObjects.ObjectFactory.Types.ObjectTypes;
 import com.zoomba.Services.Constants;
 import com.zoomba.UI.Screens.GameScreen;
 
@@ -11,11 +15,10 @@ import java.util.Random;
  * Created by ed on 20/08/16.
  */
 public class CircleFactory extends Factory {
-
     private int id = 0;
 
     @Override
-    public Circle generateCircle(ObjectTypes objectType) {
+    public Circle generate(ObjectTypes objectType) {
         float x = generateCoords(GameScreen.width);
         float y = generateCoords(GameScreen.height);
 

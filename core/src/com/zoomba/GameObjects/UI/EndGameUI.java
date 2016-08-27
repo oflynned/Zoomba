@@ -76,16 +76,16 @@ public class EndGameUI extends UIObject {
         exit = new TextButton("Exit Game", skinText);
         restart = new TextButton("Restart Game", skinText);
 
-        title.getLabel().setFontScale(5);
-        message.getLabel().setFontScale(3);
-        time.getLabel().setFontScale(3);
-        timeValue.getLabel().setFontScale(3);
-        score.getLabel().setFontScale(3);
-        scoreValue.getLabel().setFontScale(3);
-        difficulty.getLabel().setFontScale(3);
-        difficultyValue.getLabel().setFontScale(3);
-        exit.getLabel().setFontScale(3);
-        restart.getLabel().setFontScale(3);
+        title.getLabel().setFontScale(Constants.TITLE_SCALE);
+        message.getLabel().setFontScale(Constants.REG_SCALE);
+        time.getLabel().setFontScale(Constants.REG_SCALE);
+        timeValue.getLabel().setFontScale(Constants.REG_SCALE);
+        score.getLabel().setFontScale(Constants.REG_SCALE);
+        scoreValue.getLabel().setFontScale(Constants.REG_SCALE);
+        difficulty.getLabel().setFontScale(Constants.REG_SCALE);
+        difficultyValue.getLabel().setFontScale(Constants.REG_SCALE);
+        exit.getLabel().setFontScale(Constants.REG_SCALE);
+        restart.getLabel().setFontScale(Constants.REG_SCALE);
 
         table = new Table();
         table.setWidth(uiStage.getWidth());

@@ -18,6 +18,9 @@ public class Constants {
     public static final int ONE_SECOND = 100;
     public static final int GAME_LENGTH = 5 * ONE_SECOND;
 
+    public static final float TITLE_SCALE = 5;
+    public static final float REG_SCALE = 3;
+
     //multisampling
     public static final int ANTIALIASING = 8;
 
