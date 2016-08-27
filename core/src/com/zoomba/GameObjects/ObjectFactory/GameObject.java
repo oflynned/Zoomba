@@ -11,7 +11,8 @@ import sun.misc.FloatingDecimal;
  * Created by ed on 09/08/16.
  */
 public abstract class GameObject {
-    float x, y, radius;
+    double x, y;
+    float radius;
     Color color;
     float orientation;
     double velocity;
@@ -27,10 +28,10 @@ public abstract class GameObject {
         this.id = id;
     }
 
-    public void setX(float x) {
+    public void setX(double x) {
         this.x = x;
     }
-    public void setY(float y) {
+    public void setY(double y) {
         this.y = y;
     }
     public void setOrientation(float orientation) {
@@ -53,10 +54,10 @@ public abstract class GameObject {
         this.velocity = velocity;
     }
 
-    public float getX() {
+    public double getX() {
         return x;
     }
-    public float getY() {
+    public double getY() {
         return y;
     }
     public float getRadius() {

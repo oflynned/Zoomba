@@ -11,10 +11,10 @@ public class Constants {
 
     public static final float SLOW_VELOCITY = 2;
     public static final int SLOW_POINTS = 5;
-    public static final float FAST_VELOCITY = 12;
+    public static final float FAST_VELOCITY = 20;
 
     public static final int ONE_SECOND = 100;
-    public static final int GAME_LENGTH = ONE_SECOND;
+    public static final int GAME_LENGTH = 30 * ONE_SECOND;
 
     //multisampling
     public static final int ANTIALIASING = 8;

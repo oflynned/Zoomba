@@ -3,6 +3,7 @@ package com.zoomba.UI.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
  */
 public class GameScreen implements Screen {
     private Zoomba zoomba;
-    private ArrayList<Circle> slowCircles;
+    private ArrayList<Circle> spawnedCircles;
 
     private Stage mainStage;
     private OrthographicCamera worldCamera;
@@ -62,14 +63,17 @@ public class GameScreen implements Screen {
         Gdx.app.log("Difficulty", String.valueOf(Manager.getInstance().getDifficulty()));
     }
 
-    private void populateLevel() {
-        Factory circleFactory = Producer.getFactory(FactoryTypes.Circle);
-        slowCircles = new ArrayList<Circle>();
+    private void spawnCircles(Factory circleFactory, ObjectTypes objectType, Color color, float velocity) {
         for (int i = 0; i < Constants.CIRCLE_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
-            assert circleFactory != null;
-            slowCircles.add(circleFactory.generateCircle(ObjectTypes.Slow, Constants.CIRCLE_RADIUS,
-                    GameObject.getRandomOrientation(), Constants.RED_500, Constants.SLOW_VELOCITY));
+            spawnedCircles.add(circleFactory.generateCircle(objectType, Constants.CIRCLE_RADIUS,
+                    GameObject.getRandomOrientation(), color, velocity));
         }
+    }
+
+    private void populateLevel() {
+        spawnedCircles = new ArrayList<Circle>();
+        spawnCircles(Producer.getFactory(FactoryTypes.Circle), ObjectTypes.Fast,
+                Constants.YELLOW_500, Constants.FAST_VELOCITY);
     }
 
     @Override
@@ -99,7 +103,7 @@ public class GameScreen implements Screen {
 
             //Behaviour.circleCollision(getCircles());
             circle.onMove();
-            circle.onDraw(getZoomba().getSpriteBatch(), getZoomba().getShapeRenderer());
+            circle.onDraw(getZoomba().getShapeRenderer());
 
             getZoomba().getSpriteBatch().end();
         }
@@ -143,7 +147,7 @@ public class GameScreen implements Screen {
     }
 
     public ArrayList<Circle> getCircles() {
-        return slowCircles;
+        return spawnedCircles;
     }
 
     class GestureController implements GestureDetector.GestureListener, InputProcessor {

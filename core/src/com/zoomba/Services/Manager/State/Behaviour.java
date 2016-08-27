@@ -25,39 +25,39 @@ public class Behaviour {
     public static void passThroughWall(Direction direction, Circle circle) {
         if (direction.equals(Direction.Left)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT PASS THROUGH (" + circle.getId() + ")");
-            circle.setX(GameScreen.width - 2 * circle.getRadius() - 10);
-            circle.setY(GameScreen.height - circle.getY() - 10);
+            circle.setX(GameScreen.width - 2 * circle.getRadius() - circle.getVelocity());
+            circle.setY(GameScreen.height - circle.getY() - circle.getVelocity());
         } else if (direction.equals(Direction.Top)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP PASS THROUGH (" + circle.getId() + ")");
             circle.setX(GameScreen.width - circle.getX());
-            circle.setY(circle.getRadius() + 10);
+            circle.setY(circle.getRadius() + circle.getVelocity());
         } else if (direction.equals(Direction.Right)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT PASS THROUGH (" + circle.getId() + ")");
-            circle.setX(2 * circle.getRadius() + 10);
-            circle.setY(GameScreen.height - circle.getY() - 10);
+            circle.setX(2 * circle.getRadius() + circle.getVelocity());
+            circle.setY(GameScreen.height - circle.getY() - circle.getVelocity());
         } else if (direction.equals(Direction.Bottom)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM PASS THROUGH (" + circle.getId() + ")");
-            circle.setX(GameScreen.width - circle.getX() - 10);
-            circle.setY(GameScreen.height - circle.getRadius() - 10);
+            circle.setX(GameScreen.width - circle.getX() - circle.getVelocity());
+            circle.setY(GameScreen.height - circle.getRadius() - circle.getVelocity());
         }
     }
 
     public static void collideWall(Direction direction, Circle circle) {
         if (direction.equals(Direction.Left)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT COLLISION (" + circle.getId() + ")");
-            circle.setX(circle.getX() + 10);
+            circle.setX(circle.getX() + circle.getVelocity());
             circle.setOrientation(getVerticalBounce(circle.getOrientation()));
         } else if (direction.equals(Direction.Right)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT COLLISION (" + circle.getId() + ")");
-            circle.setX(circle.getX() - 10);
+            circle.setX(circle.getX() - circle.getVelocity());
             circle.setOrientation(getVerticalBounce(circle.getOrientation()));
         } else if (direction.equals(Direction.Top)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP COLLISION (" + circle.getId() + ")");
-            circle.setY(circle.getY() - 10);
+            circle.setY(circle.getY() - circle.getVelocity());
             circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
         } else if (direction.equals(Direction.Bottom)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM COLLISION (" + circle.getId() + ")");
-            circle.setY(circle.getY() + 10);
+            circle.setY(circle.getY() + circle.getVelocity());
             circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
         }
         Gdx.app.log(Constants.PHYSICS_ATTRIBUTE_DEBUG, circle.getOrientation() + " degrees");
