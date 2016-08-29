@@ -110,13 +110,8 @@ public class HighScore implements Screen {
 
         Gdx.gl.glClearColor(33f / 255f, 150f / 255f, 243f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         camera.update();
-        getZoomba().getSpriteBatch().enableBlending();
-        Color color = getZoomba().getSpriteBatch().getColor();
-        getZoomba().getSpriteBatch().setColor(color.r, color.g, color.b, 1f);
         getZoomba().getSpriteBatch().begin();
         getZoomba().getSpriteBatch().setProjectionMatrix(camera.combined);
         for (Circle circle : getCircles()) {
@@ -124,9 +119,8 @@ public class HighScore implements Screen {
             circle.onDraw(texture, getZoomba().getSpriteBatch(), getZoomba().getShapeRenderer());
         }
         getZoomba().getSpriteBatch().end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        scoreUi.onUpdate(gameWidth, gameHeight, getCircles().size());
+        scoreUi.onUpdate(Helper.getAspectWidth(gameHeight), gameHeight, getCircles().size());
         scoreUi.onDraw();
     }
 
@@ -154,6 +148,7 @@ public class HighScore implements Screen {
     @Override
     public void dispose() {
         scoreUi.onDispose();
+        texture.dispose();
     }
 
     public Zoomba getZoomba() {
