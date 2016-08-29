@@ -2,6 +2,8 @@ package com.zoomba.GameObjects.ObjectFactory.Objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.zoomba.Services.Constants;
@@ -30,11 +32,9 @@ public abstract class Circle extends GameObject implements PlayerFocus {
                 getXVel() + " " + getYVel() + " (" + getClass() + ")");
     }
 
-    public void onDraw(ShapeRenderer renderer) {
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.circle((float) getX() + getRadius(), (float) getY(), getRadius());
-        renderer.setColor(getColor());
-        renderer.end();
+    public void onDraw(Texture texture, Batch batch, ShapeRenderer renderer) {
+        batch.draw(texture, (float) getX(), (float) (getY() - getRadius()),
+                Constants.CIRCLE_RADIUS * 2, Constants.CIRCLE_RADIUS * 2);
 
         if (Manager.getInstance().getDebugState().equals(DebugState.Outline)) {
             renderer.begin(ShapeRenderer.ShapeType.Line);
@@ -86,7 +86,4 @@ public abstract class Circle extends GameObject implements PlayerFocus {
     public boolean isBottomCollision() {
         return getY() - getRadius() <= 0;
     }
-
-
-
 }

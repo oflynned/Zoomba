@@ -5,11 +5,14 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -53,7 +56,7 @@ public class HighScore implements Screen {
     private Texture texture;
 
     public HighScore(Zoomba zoomba) {
-        texture = new Texture("badlogic.jpg");
+        texture = new Texture("bubble.png");
 
         this.zoomba = zoomba;
         scoreUi = new ScoreUI(Helper.getAspectWidth(gameHeight), gameHeight);
@@ -63,7 +66,6 @@ public class HighScore implements Screen {
         viewport = new FitViewport(Helper.getAspectWidth(gameHeight), gameHeight, camera);
         viewport.apply();
         camera.position.set(Helper.getAspectWidth(gameHeight) / 2, gameHeight / 2, 0);
-        //camera.translate(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
 
         Gdx.input.setInputProcessor(new InputMultiplexer(
                 new GestureDetector(20, 0.5f, 1f, 0.15f, new GestureController())));
@@ -108,18 +110,21 @@ public class HighScore implements Screen {
 
         Gdx.gl.glClearColor(33f / 255f, 150f / 255f, 243f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         camera.update();
+        getZoomba().getSpriteBatch().enableBlending();
+        Color color = getZoomba().getSpriteBatch().getColor();
+        getZoomba().getSpriteBatch().setColor(color.r, color.g, color.b, 1f);
         getZoomba().getSpriteBatch().begin();
         getZoomba().getSpriteBatch().setProjectionMatrix(camera.combined);
-        getZoomba().getSpriteBatch().draw(texture, camera.viewportWidth / 2 - texture.getWidth() / 2,
-                camera.viewportHeight / 2 - texture.getHeight() / 2);
-        getZoomba().getSpriteBatch().end();
-
         for (Circle circle : getCircles()) {
             circle.onMove();
-            circle.onDraw(getZoomba().getShapeRenderer());
+            circle.onDraw(texture, getZoomba().getSpriteBatch(), getZoomba().getShapeRenderer());
         }
+        getZoomba().getSpriteBatch().end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         scoreUi.onUpdate(gameWidth, gameHeight, getCircles().size());
         scoreUi.onDraw();
@@ -160,8 +165,6 @@ public class HighScore implements Screen {
     }
 
     private class GestureController implements GestureDetector.GestureListener {
-
-        float scale = 1;
 
         @Override
         public boolean touchDown(float x, float y, int pointer, int button) {
@@ -204,10 +207,14 @@ public class HighScore implements Screen {
         @Override
         public boolean zoom(float initialDistance, float distance) {
             float ratio = initialDistance / distance;
+            Gdx.app.log("Zoom", String.valueOf(ratio));
 
             camera.zoom = initialScale * ratio;
-            gameHeight = (int) (gameHeight * camera.zoom);
-            gameWidth = Helper.getAspectWidth(gameHeight);
+            if (camera.zoom > 1) camera.zoom = 1;
+            else {
+                gameHeight = (int) (gameHeight * camera.zoom);
+                gameWidth = Helper.getAspectWidth(gameHeight);
+            }
             return true;
         }
 
