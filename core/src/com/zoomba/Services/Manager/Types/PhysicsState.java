@@ -1,4 +1,4 @@
-package com.zoomba.Services.Manager.State;
+package com.zoomba.Services.Manager.Types;
 
 /**
  * Created by ed on 22/08/2016.

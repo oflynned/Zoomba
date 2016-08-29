@@ -2,6 +2,7 @@ package com.zoomba.GameObjects.ObjectFactory.Objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.Random;
 
@@ -11,26 +12,24 @@ import sun.misc.FloatingDecimal;
  * Created by ed on 09/08/16.
  */
 public abstract class GameObject {
-    double x, y, velocity;
+    Vector2 position;
+    double velocity;
     float radius, orientation;
     Color color;
-    int id;
 
-    public GameObject(float x, float y, float radius, float orientation, Color color, float velocity, int id) {
-        this.x = x;
-        this.y = y;
+    public GameObject(Vector2 position, float radius, float orientation, Color color, float velocity) {
+        this.position = position;
         this.radius = radius;
         this.orientation = orientation;
         this.color = color;
         this.velocity = velocity;
-        this.id = id;
     }
 
     public void setX(double x) {
-        this.x = x;
+        this.position.x = (float) x;
     }
     public void setY(double y) {
-        this.y = y;
+        this.position.y = (float) y;
     }
     public void setOrientation(float orientation) {
         this.orientation = orientation;
@@ -49,11 +48,11 @@ public abstract class GameObject {
     }
 
     public double getX() {
-        return x;
+        return position.x;
     }
 
     public double getY() {
-        return y;
+        return position.y;
     }
 
     public float getRadius() {
@@ -78,9 +77,5 @@ public abstract class GameObject {
 
     public Color getColor() {
         return color;
-    }
-
-    public int getId() {
-        return id;
     }
 }

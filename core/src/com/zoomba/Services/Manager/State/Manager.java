@@ -1,9 +1,12 @@
 package com.zoomba.Services.Manager.State;
 
+import com.badlogic.gdx.utils.Timer;
 import com.zoomba.GameObjects.Circles.Fast;
 import com.zoomba.GameObjects.Circles.Slow;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.Services.Constants;
+import com.zoomba.Services.Manager.Types.DebugState;
+import com.zoomba.Services.Manager.Types.GameState;
 
 /**
  * Created by ed on 09/08/16.
@@ -13,6 +16,7 @@ public class Manager {
     private GameState state;
     private int points;
     private int difficulty;
+    private DebugState debugState = DebugState.Normal;
 
     private static Manager manager = null;
 
@@ -21,12 +25,21 @@ public class Manager {
         return manager;
     }
 
-    public void countdown(int entityCount) {
+    public void startTimer() {
+        setCurrentEpoch(Constants.GAME_LENGTH);
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                currentEpoch--;
+            }
+        }, 1f);
+    }
+
+    public void checkState(int entityCount) {
         if(getCurrentEpoch() > Constants.ONE_SECOND) {
             currentEpoch--;
             state = GameState.Ongoing;
         } else {
-            // loss : win
             state = entityCount > 0 ? GameState.Loss : GameState.Win;
         }
     }
@@ -37,6 +50,14 @@ public class Manager {
         } else if(circle.getClass().equals(Fast.class)) {
             points += Constants.FAST_POINTS;
         }
+    }
+
+    public void setDebugState(DebugState debugState) {
+        this.debugState = debugState;
+    }
+
+    public DebugState getDebugState() {
+        return debugState;
     }
 
     public int getCurrentEpoch() {

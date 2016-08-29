@@ -10,12 +10,10 @@ import com.zoomba.Zoomba;
  * Created by ed on 27/08/16.
  */
 public class EndGameScreen implements Screen {
-    Zoomba zoomba;
     EndGameUI endGameUI;
 
     public EndGameScreen(Zoomba zoomba) {
-        this.zoomba = zoomba;
-        endGameUI = new EndGameUI();
+        endGameUI = new EndGameUI(zoomba);
     }
 
     @Override

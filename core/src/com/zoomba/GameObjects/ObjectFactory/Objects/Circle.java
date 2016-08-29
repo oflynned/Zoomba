@@ -3,17 +3,23 @@ package com.zoomba.GameObjects.ObjectFactory.Objects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.zoomba.Services.Constants;
+import com.zoomba.Services.Interfaces.PlayerFocus;
 import com.zoomba.Services.Manager.State.Behaviour;
-import com.zoomba.Services.Manager.State.Direction;
-import com.zoomba.UI.Screens.GameScreen;
+import com.zoomba.Services.Manager.State.Manager;
+import com.zoomba.Services.Manager.Types.DebugState;
+import com.zoomba.Services.Manager.Types.Direction;
+import com.zoomba.UI.Modes.HighScore;
 
 /**
  * Created by ed on 20/08/16.
  */
-public abstract class Circle extends GameObject {
-    public Circle(float x, float y, float radius, float orientation, Color color, float velocity, int id) {
-        super(x, y, radius, orientation, color, velocity, id);
+public abstract class Circle extends GameObject implements PlayerFocus {
+
+    public Circle(Vector2 position, Color color, float velocity) {
+        super(position, Constants.CIRCLE_RADIUS, GameObject.getRandomOrientation(), color, velocity);
+        onSpawn();
     }
 
     public void onSpawn() {
@@ -21,7 +27,7 @@ public abstract class Circle extends GameObject {
         setY(GameObject.getRandomY());
         setOrientation(GameObject.getRandomOrientation());
         Gdx.app.log(Constants.OBJECT_DEBUG, "onSpawn() @ (" + getX() + ", " + getY() + ") with vels " +
-                getXVel() + " " + getYVel() + ", id: " + getId() + " (" + getClass() + ")");
+                getXVel() + " " + getYVel() + " (" + getClass() + ")");
     }
 
     public void onDraw(ShapeRenderer renderer) {
@@ -29,6 +35,13 @@ public abstract class Circle extends GameObject {
         renderer.circle((float) getX() + getRadius(), (float) getY(), getRadius());
         renderer.setColor(getColor());
         renderer.end();
+
+        if (Manager.getInstance().getDebugState().equals(DebugState.Outline)) {
+            renderer.begin(ShapeRenderer.ShapeType.Line);
+            renderer.rect((float) getX(), (float) getY() - getRadius(), 2 * getRadius(), 2 * getRadius());
+            renderer.setColor(getColor());
+            renderer.end();
+        }
     }
 
     public void onMove() {
@@ -42,7 +55,7 @@ public abstract class Circle extends GameObject {
 
     public void onCollision() {
         Gdx.app.log(Constants.OBJECT_DEBUG, "onCollision() @ (" + getX() + "," + getY() +
-                ") with id " + getId() + " (" + getClass() + ")");
+                ") (" + getClass() + ")");
         if(isLeftCollision()) {
             Behaviour.generateStateTransition(Direction.Left, this);
         } else if (isTopCollision()) {
@@ -54,14 +67,6 @@ public abstract class Circle extends GameObject {
         }
     }
 
-    public void onCapture(){
-
-    }
-
-    public void onDestroy() {
-
-    }
-
     public boolean isCollision() {
         return isLeftCollision() || isTopCollision() || isRightCollision() || isBottomCollision();
     }
@@ -71,14 +76,17 @@ public abstract class Circle extends GameObject {
     }
 
     public boolean isTopCollision() {
-        return getY() + getRadius() >= GameScreen.height;
+        return getY() + getRadius() >= HighScore.height;
     }
 
     public boolean isRightCollision() {
-        return getX() + getRadius()*2 >= GameScreen.width;
+        return getX() + getRadius()*2 >= HighScore.width;
     }
 
     public boolean isBottomCollision() {
         return getY() - getRadius() <= 0;
     }
+
+
+
 }

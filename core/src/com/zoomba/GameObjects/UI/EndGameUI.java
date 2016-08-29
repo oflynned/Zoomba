@@ -1,53 +1,42 @@
 package com.zoomba.GameObjects.UI;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.zoomba.Services.Constants;
+import com.zoomba.Services.Interfaces.UIObject;
 import com.zoomba.Services.Manager.State.Manager;
-import com.zoomba.UI.Screens.GameScreen;
-
-import javafx.scene.control.Tab;
+import com.zoomba.UI.Modes.HighScore;
+import com.zoomba.Zoomba;
 
 /**
  * Created by ed on 27/08/16.
  */
-public class EndGameUI extends UIObject {
-    Skin skinPressable, skinText;
-    Stage uiStage;
-    Pixmap pixmap;
+public class EndGameUI implements UIObject {
+    private Skin skinText;
+    private Stage uiStage;
+    private Pixmap pixmap;
 
-    TextButton restart, exit;
-    TextButton title, message, scoreValue, score, difficultyValue, difficulty, timeValue, time;
-    Table table;
+    private TextButton restart, exit;
+    private TextButton title, message, scoreValue, score, difficultyValue, difficulty, timeValue, time;
+    private Table table;
 
-    public EndGameUI() {
-        uiStage = new Stage(new FitViewport(GameScreen.width, GameScreen.height));
+    public EndGameUI(final Zoomba zoomba) {
+        uiStage = new Stage(new FitViewport(HighScore.width, HighScore.height));
         skinText = new Skin();
 
         pixmap = new Pixmap(150, 150, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
-
-        /*skinPressable.add("black", new Texture(pixmap));
-        skinPressable.add("default", new BitmapFont());
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skinPressable.newDrawable("white", Color.WHITE);
-        textButtonStyle.down = skinPressable.newDrawable("white", Color.WHITE);
-        textButtonStyle.checked = skinPressable.newDrawable("white", Color.WHITE);
-        textButtonStyle.over = skinPressable.newDrawable("white", Color.WHITE);
-        textButtonStyle.font = skinPressable.getFont("default");
-        skinPressable.add("default", textButtonStyle);*/
 
         BitmapFont bitmapFont = new BitmapFont();
         bitmapFont.setColor(Color.BLACK);
@@ -109,6 +98,20 @@ public class EndGameUI extends UIObject {
         statItems.add(difficulty);
         statItems.add(difficultyValue);
 
+        restart.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                zoomba.setScreen(new HighScore(zoomba));
+            }
+        });
+
+        exit.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+
+            }
+        });
+
         actionItems.add(restart);
         actionItems.add(new TextButton("\t", skinText));
         actionItems.add(exit);
@@ -127,6 +130,8 @@ public class EndGameUI extends UIObject {
         timeValue.setText(Constants.GAME_LENGTH / 100 + "s");
         scoreValue.setText(String.valueOf(Manager.getInstance().getPoints()));
         difficultyValue.setText(String.valueOf(Manager.getInstance().getDifficulty()));
+
+        Gdx.input.setInputProcessor(uiStage);
     }
 
     @Override
@@ -135,14 +140,13 @@ public class EndGameUI extends UIObject {
     }
 
     @Override
-    public void onUpdate(int time, int score) {
+    public void onUpdate(int width, int height, int instances) {
 
     }
 
     @Override
     public void onDispose() {
         uiStage.dispose();
-        skinPressable.dispose();
         skinText.dispose();
         pixmap.dispose();
     }

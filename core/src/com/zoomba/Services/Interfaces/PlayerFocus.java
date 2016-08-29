@@ -3,8 +3,8 @@ package com.zoomba.Services.Interfaces;
 /**
  * Created by ed on 09/08/16.
  */
-public interface PlayerInteraction {
+public interface PlayerFocus {
     void onFocus();
-    void onCapture();
-    void onFailedCapture();
+    void onSuccess();
+    void onFailed();
 }

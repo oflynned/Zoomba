@@ -3,8 +3,7 @@ package com.zoomba;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.zoomba.Services.Manager.State.Manager;
-import com.zoomba.UI.Screens.GameScreen;
+import com.zoomba.UI.Modes.HighScore;
 
 public class Zoomba extends Game {
 	private SpriteBatch spriteBatch;
@@ -15,7 +14,7 @@ public class Zoomba extends Game {
 		spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-		setScreen(new GameScreen(this));
+		setScreen(new HighScore(this));
 	}
 
 	@Override
@@ -24,9 +23,7 @@ public class Zoomba extends Game {
 	}
 	
 	@Override
-	public void dispose () {
-
-	}
+	public void dispose () { }
 
 	public SpriteBatch getSpriteBatch() {
 		return spriteBatch;

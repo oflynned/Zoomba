@@ -11,19 +11,25 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.zoomba.Services.Interfaces.UIObject;
+import com.zoomba.Services.Manager.State.Manager;
 
 /**
  * Created by ed on 25/08/16.
  */
-public class ScoreUI extends UIObject {
+public class ScoreUI implements UIObject {
     private Stage uiStage;
     private Skin skin;
     private Pixmap pixmap;
     private Table table;
-    private TextButton scoreText, scoreValue, timeText, timeValue;
+    private TextButton difficultyText, difficultyValue, scoreText, scoreValue, timeText,
+            timeValue, instanceText, instanceNumber;
 
-    public ScoreUI(float width, float height) {
-        uiStage = new Stage(new FitViewport(width, height));
+    FitViewport viewport;
+
+    public ScoreUI(int width, int height) {
+        viewport = new FitViewport(width, height);
+        uiStage = new Stage(viewport);
         skin = new Skin();
 
         pixmap = new Pixmap(150, 150, Pixmap.Format.RGBA8888);
@@ -41,11 +47,19 @@ public class ScoreUI extends UIObject {
         textButtonStyle.font = skin.getFont("default");
         skin.add("default", textButtonStyle);
 
+        instanceText = new TextButton("Instances:", skin);
+        instanceNumber = new TextButton("InstanceValue", skin);
+        difficultyText = new TextButton("Difficulty:", skin);
+        difficultyValue = new TextButton("DifficultyValue", skin);
         scoreText = new TextButton("Score:", skin);
         scoreValue = new TextButton("ScoreValue", skin);
         timeText = new TextButton("Time:", skin);
         timeValue = new TextButton("TimeValue", skin);
 
+        instanceText.getLabel().setFontScale(3);
+        instanceNumber.getLabel().setFontScale(3);
+        difficultyText.getLabel().setFontScale(3);
+        difficultyValue.getLabel().setFontScale(3);
         scoreText.getLabel().setFontScale(3);
         scoreValue.getLabel().setFontScale(3);
         timeText.getLabel().setFontScale(3);
@@ -56,6 +70,10 @@ public class ScoreUI extends UIObject {
         table.align(Align.center|Align.top);
         table.setPosition(0, Gdx.graphics.getHeight());
 
+        table.add(instanceText);
+        table.add(instanceNumber);
+        table.add(difficultyText);
+        table.add(difficultyValue);
         table.add(scoreText);
         table.add(scoreValue);
         table.add(timeText);
@@ -70,9 +88,12 @@ public class ScoreUI extends UIObject {
     }
 
     @Override
-    public void onUpdate(int time, int score) {
-        timeValue.setText(String.valueOf(time));
-        scoreValue.setText(String.valueOf(score));
+    public void onUpdate(int width, int height, int instances) {
+
+        instanceNumber.setText(String.valueOf(instances));
+        difficultyValue.setText(String.valueOf(Manager.getInstance().getDifficulty()));
+        timeValue.setText(String.valueOf(Manager.getInstance().getCurrentEpoch() / 100));
+        scoreValue.setText(String.valueOf(Manager.getInstance().getPoints()));
     }
 
     @Override

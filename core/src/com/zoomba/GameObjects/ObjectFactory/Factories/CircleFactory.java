@@ -4,10 +4,8 @@ import com.zoomba.GameObjects.Circles.Fast;
 import com.zoomba.GameObjects.Circles.Slow;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
-import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.Types.ObjectTypes;
-import com.zoomba.Services.Constants;
-import com.zoomba.UI.Screens.GameScreen;
+import com.zoomba.UI.Modes.HighScore;
 
 import java.util.Random;
 
@@ -15,17 +13,16 @@ import java.util.Random;
  * Created by ed on 20/08/16.
  */
 public class CircleFactory extends Factory {
-    private int id = 0;
 
     @Override
-    public Circle generate(ObjectTypes objectType) {
-        float x = generateCoords(GameScreen.width);
-        float y = generateCoords(GameScreen.height);
+    public Circle generateCircle(ObjectTypes objectType) {
+        float x = generateCoords(HighScore.width);
+        float y = generateCoords(HighScore.height);
 
         if (objectType.equals(ObjectTypes.Slow))
-            return new Slow(x, y, Constants.CIRCLE_RADIUS, GameObject.getRandomOrientation(), generateId());
+            return new Slow(x, y);
         else if (objectType.equals(ObjectTypes.Fast))
-            return new Fast(x, y, Constants.CIRCLE_RADIUS, GameObject.getRandomOrientation(), generateId());
+            return new Fast(x, y);
         else return null;
     }
 
@@ -33,7 +30,4 @@ public class CircleFactory extends Factory {
         return new Random().nextInt((int)limit);
     }
 
-    private int generateId() {
-        return ++id;
-    }
 }
