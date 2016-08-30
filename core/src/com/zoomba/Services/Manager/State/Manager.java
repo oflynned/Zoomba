@@ -38,7 +38,7 @@ public class Manager {
     public void checkState(int entityCount) {
         if(getCurrentEpoch() > Constants.ONE_SECOND) {
             currentEpoch--;
-            state = GameState.Ongoing;
+            state = entityCount > 0 ? GameState.Ongoing : GameState.Win;
         } else {
             state = entityCount > 0 ? GameState.Loss : GameState.Win;
         }

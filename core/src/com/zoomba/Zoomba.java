@@ -1,25 +1,28 @@
 package com.zoomba;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zoomba.UI.Modes.HighScore;
+import com.zoomba.UI.Screens.MainMenu;
 
 public class Zoomba extends Game {
 	private SpriteBatch spriteBatch;
-    private ShapeRenderer shapeRenderer;
+	private boolean isBackPressed = false;
 	
 	@Override
 	public void create () {
 		spriteBatch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer();
-
-		setScreen(new HighScore(this));
+		setScreen(new MainMenu(this));
 	}
 
 	@Override
 	public void render () {
 		super.render();
+		isBackPressed = Gdx.input.isKeyPressed(Input.Keys.BACK);
+		if (isBackPressed) Gdx.app.exit();
 	}
 	
 	@Override
@@ -28,8 +31,4 @@ public class Zoomba extends Game {
 	public SpriteBatch getSpriteBatch() {
 		return spriteBatch;
 	}
-
-    public ShapeRenderer getShapeRenderer() {
-        return shapeRenderer;
-    }
 }

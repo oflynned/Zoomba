@@ -32,16 +32,9 @@ public abstract class Circle extends GameObject implements PlayerFocus {
                 getXVel() + " " + getYVel() + " (" + getClass() + ")");
     }
 
-    public void onDraw(Texture texture, Batch batch, ShapeRenderer renderer) {
+    public void onDraw(Texture texture, Batch batch) {
         batch.draw(texture, (float) getX(), (float) (getY() - getRadius()),
                 Constants.CIRCLE_RADIUS * 2, Constants.CIRCLE_RADIUS * 2);
-
-        if (Manager.getInstance().getDebugState().equals(DebugState.Outline)) {
-            renderer.begin(ShapeRenderer.ShapeType.Line);
-            renderer.rect((float) getX(), (float) getY() - getRadius(), 2 * getRadius(), 2 * getRadius());
-            renderer.setColor(getColor());
-            renderer.end();
-        }
     }
 
     public void onMove() {
