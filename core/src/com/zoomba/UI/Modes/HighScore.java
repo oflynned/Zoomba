@@ -2,26 +2,19 @@ package com.zoomba.UI.Modes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
-import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Producer;
 import com.zoomba.GameObjects.ObjectFactory.Types.FactoryTypes;
 import com.zoomba.GameObjects.ObjectFactory.Types.ObjectTypes;
@@ -35,6 +28,7 @@ import com.zoomba.UI.Screens.EndGameScreen;
 import com.zoomba.Zoomba;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by ed on 09/08/16.
@@ -51,16 +45,17 @@ public class HighScore implements Screen {
 
     private OrthographicCamera camera;
     private Viewport viewport;
-    private float initialScale = 1;
 
-    private Texture texture;
+    private Texture bubbleTexture;
+    private Texture centreTexture;
 
     public HighScore(Zoomba zoomba) {
-        texture = new Texture("bubble.png");
+        bubbleTexture = new Texture("bubble.png");
+        centreTexture = new Texture("badlogic.jpg");
 
         this.zoomba = zoomba;
         scoreUi = new ScoreUI(Helper.getAspectWidth(gameHeight), gameHeight);
-        spawn();
+        spawn(true);
 
         camera = new OrthographicCamera(Helper.getAspectWidth(gameHeight), gameHeight);
         viewport = new FitViewport(Helper.getAspectWidth(gameHeight), gameHeight, camera);
@@ -71,10 +66,13 @@ public class HighScore implements Screen {
                 new GestureDetector(20, 0.5f, 1f, 0.15f, new GestureController())));
     }
 
-    public void spawn() {
+    public void spawn(boolean isStart) {
         Manager.getInstance().startTimer();
         Manager.getInstance().setCurrentEpoch(Constants.GAME_LENGTH);
         Manager.getInstance().setState(GameState.Ongoing);
+        if(isStart) {
+            Manager.getInstance().setDifficulty(0);
+        }
         Manager.getInstance().setPoints(Manager.getInstance().getPoints() +
                 Manager.getInstance().getDifficulty() * 10);
         Manager.getInstance().setDifficulty(Manager.getInstance().getDifficulty() + 1);
@@ -98,14 +96,32 @@ public class HighScore implements Screen {
 
     }
 
+    public boolean isTolerance(Camera camera, Circle circle) {
+        //Gdx.app.log("Tolerance", viewport.getScreenHeight() + " " + circle.getRadius());
+        return camera.position.x < circle.getX() &&
+                camera.position.x > circle.getX() + 2*circle.getRadius() &&
+                camera.position.y < circle.getY() + circle.getRadius() &&
+                camera.position.y > circle.getY() - circle.getRadius() &&
+                gameHeight <= 2*circle.getRadius();
+    }
+
     @Override
     public void render(float delta) {
         Manager.getInstance().checkState(getCircles().size());
         if (Manager.getInstance().getState().equals(GameState.Loss)) {
-            //getZoomba().setScreen(new EndGameScreen(getZoomba()));
-            spawn();
+            getZoomba().setScreen(new EndGameScreen(getZoomba()));
+            //spawn();
         } else if (Manager.getInstance().getState().equals(GameState.Win)) {
-            spawn();
+            spawn(false);
+        }
+
+        for(Iterator<Circle> it = getCircles().iterator(); it.hasNext();) {
+            Circle circle = it.next();
+            circle.onMove();
+            if (isTolerance(camera, circle)) {
+                Manager.getInstance().incrementScore(circle);
+                it.remove();
+            }
         }
 
         Gdx.gl.glClearColor(33f / 255f, 150f / 255f, 243f / 255f, 1);
@@ -114,9 +130,16 @@ public class HighScore implements Screen {
         camera.update();
         getZoomba().getSpriteBatch().begin();
         getZoomba().getSpriteBatch().setProjectionMatrix(camera.combined);
+        getZoomba().getSpriteBatch().draw(centreTexture, -height, 0, height, height);
+        getZoomba().getSpriteBatch().draw(centreTexture, width, 0, height, height);
+        getZoomba().getSpriteBatch().draw(centreTexture, 0, height, width, width);
+        getZoomba().getSpriteBatch().draw(centreTexture, 0, -width, width, width);
+
+        getZoomba().getSpriteBatch().draw(centreTexture, camera.position.x - 25,
+                camera.position.y - 25, 50, 50);
+
         for (Circle circle : getCircles()) {
-            circle.onMove();
-            circle.onDraw(texture, getZoomba().getSpriteBatch(), getZoomba().getShapeRenderer());
+            circle.onDraw(bubbleTexture, getZoomba().getSpriteBatch(), getZoomba().getShapeRenderer());
         }
         getZoomba().getSpriteBatch().end();
 
@@ -148,7 +171,7 @@ public class HighScore implements Screen {
     @Override
     public void dispose() {
         scoreUi.onDispose();
-        texture.dispose();
+        bubbleTexture.dispose();
     }
 
     public Zoomba getZoomba() {
@@ -160,6 +183,7 @@ public class HighScore implements Screen {
     }
 
     private class GestureController implements GestureDetector.GestureListener {
+        float scale = 1;
 
         @Override
         public boolean touchDown(float x, float y, int pointer, int button) {
@@ -188,9 +212,21 @@ public class HighScore implements Screen {
 
         @Override
         public boolean pan(float x, float y, float deltaX, float deltaY) {
+            //translate the camera centre to the new panned coords
             Vector3 position = new Vector3(x, y, 0);
             camera.unproject(position);
             camera.translate(-deltaX, deltaY, 0);
+
+            //anchor the camera into the bounds of the game arena
+            if (camera.position.x > width) {
+                camera.position.x = width;
+            } else if (camera.position.x < 0) {
+                camera.position.x = 0;
+            } else if (camera.position.y > height) {
+                camera.position.y = height;
+            } else if (camera.position.y < 0) {
+                camera.position.y = 0;
+            }
             return true;
         }
 
@@ -202,9 +238,11 @@ public class HighScore implements Screen {
         @Override
         public boolean zoom(float initialDistance, float distance) {
             float ratio = initialDistance / distance;
-            Gdx.app.log("Zoom", String.valueOf(ratio));
 
-            camera.zoom = initialScale * ratio;
+            scale = camera.zoom;
+            camera.zoom = scale * ratio;
+            Gdx.app.log("Camera", String.valueOf(camera.zoom));
+
             if (camera.zoom > 1) camera.zoom = 1;
             else {
                 gameHeight = (int) (gameHeight * camera.zoom);
