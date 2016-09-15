@@ -56,7 +56,6 @@ public class HighScore implements Screen {
     private Viewport viewport;
 
     private Texture bubbleTexture;
-    private Texture hazardTexture, powerupTexture;
 
     //hazards
     private Texture decreaseCircleSizeTexture, decreaseScrollTexture, decreaseZoomSpeedTexture,
@@ -113,6 +112,10 @@ public class HighScore implements Screen {
         Manager.getInstance().startSpawnTimer();
         Manager.getInstance().setState(GameState.Ongoing);
 
+        getHazards().clear();
+        getPowerups().clear();
+        getSpawnedCircles().clear();
+
         if (isStart) Manager.getInstance().setDifficulty(0);
         Manager.getInstance().setPoints(Manager.getInstance().getPoints() +
                 Manager.getInstance().getDifficulty() * 10);
@@ -122,11 +125,6 @@ public class HighScore implements Screen {
 
     private void populateLevel() {
         Factory circleFactory = Producer.getFactory(FactoryTypes.Circle);
-        assert circleFactory != null;
-
-        spawnedCircles.clear();
-        circleFactory.generateCircle(CircleTypes.Slow);
-
         for (int i = 0; i < Constants.CIRCLE_INITIAL_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
             spawnedCircles.add(circleFactory.generateCircle(CircleTypes.Slow));
         }
@@ -292,8 +290,18 @@ public class HighScore implements Screen {
     public void dispose() {
         scoreUi.onDispose();
         bubbleTexture.dispose();
-        hazardTexture.dispose();
-        powerupTexture.dispose();
+        decreaseCircleSizeTexture.dispose();
+        decreaseScrollTexture.dispose();
+        decreaseZoomSpeedTexture.dispose();
+        increaseCircleSpeedTexture.dispose();
+        increaseCircleSpeedTexture.dispose();
+        instantLossTexture.dispose();
+        invertibilityTexture.dispose();
+        invisibilityTexture.dispose();
+        decreaseCircleSpeedTexture.dispose();
+        increaseCircleSizeTexture.dispose();
+        increaseScrollSpeedTexture.dispose();
+        increaseZoomSpeedTexture.dispose();
     }
 
     public Zoomba getZoomba() {
