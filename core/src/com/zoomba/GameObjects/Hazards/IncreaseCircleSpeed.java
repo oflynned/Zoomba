@@ -1,5 +1,6 @@
 package com.zoomba.GameObjects.Hazards;
 
+import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
 
@@ -15,12 +16,32 @@ public class IncreaseCircleSpeed extends Hazard {
     }
 
     @Override
-    public void onPickup(ArrayList<GameObject> gameObjects) {
+    public void onUpdate() {
 
     }
 
     @Override
-    public void onDestroy(ArrayList<GameObject> gameObjects) {
+    public void onPickup(ArrayList<Circle> circles) {
+
+    }
+
+    @Override
+    public void onDestroy(ArrayList<Circle> circles) {
+
+    }
+
+    @Override
+    public void onFocus() {
+
+    }
+
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onFailed() {
 
     }
 }

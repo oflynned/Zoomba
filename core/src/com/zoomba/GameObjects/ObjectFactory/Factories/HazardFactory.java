@@ -1,9 +1,11 @@
 package com.zoomba.GameObjects.ObjectFactory.Factories;
 
+import com.badlogic.gdx.Gdx;
 import com.zoomba.GameObjects.Hazards.DecreaseCircleSize;
 import com.zoomba.GameObjects.Hazards.DecreaseScrollSpeed;
 import com.zoomba.GameObjects.Hazards.DecreaseZoomSpeed;
 import com.zoomba.GameObjects.Hazards.IncreaseCircleSpeed;
+import com.zoomba.GameObjects.Hazards.InstantLoss;
 import com.zoomba.GameObjects.Hazards.Invertibility;
 import com.zoomba.GameObjects.Hazards.Invisibility;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
@@ -34,6 +36,7 @@ public class HazardFactory extends Factory {
 
     @Override
     public Hazard generateHazard(HazardTypes hazardTypes) {
+        Gdx.app.log("Hazard", "Generating hazard (" + hazardTypes.name() + ")");
         float x = GameObject.getRandomX();
         float y = GameObject.getRandomY();
         float orientation = GameObject.getRandomOrientation();
@@ -54,6 +57,8 @@ public class HazardFactory extends Factory {
             return new Invisibility(x, y, radius, orientation, velocity, lifetime, existence);
         } else if (hazardTypes.equals(HazardTypes.IncreaseCircleSpeed)) {
             return new IncreaseCircleSpeed(x, y, radius, orientation, velocity, lifetime, existence);
+        } else if (hazardTypes.equals(HazardTypes.InstantLoss)) {
+            return new InstantLoss(x, y, radius, orientation, velocity, lifetime, existence);
         }
         return null;
     }

@@ -13,11 +13,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.zoomba.GameObjects.ObjectFactory.Factories.HazardFactory;
+import com.zoomba.GameObjects.ObjectFactory.Factories.PowerupFactory;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
+import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Powerup;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Producer;
 import com.zoomba.GameObjects.ObjectFactory.Types.FactoryTypes;
 import com.zoomba.GameObjects.ObjectFactory.Types.CircleTypes;
+import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
+import com.zoomba.GameObjects.ObjectFactory.Types.PowerupTypes;
 import com.zoomba.GameObjects.UI.ScoreUI;
 import com.zoomba.Services.Constants;
 import com.zoomba.Services.Manager.Gesture.Helper;
@@ -37,6 +44,8 @@ import java.util.Iterator;
 public class HighScore implements Screen {
     private Zoomba zoomba;
     private ArrayList<Circle> spawnedCircles = new ArrayList<Circle>();
+    private ArrayList<Powerup> powerups = new ArrayList<Powerup>();
+    private ArrayList<Hazard> hazards = new ArrayList<Hazard>();
 
     private ScoreUI scoreUi;
 
@@ -48,12 +57,17 @@ public class HighScore implements Screen {
     private GestureController gestureController;
     private Viewport viewport;
 
-    private Texture bubbleTexture;
+    private Texture bubbleTexture, hazardTexture, powerupTexture;
+    private Texture crosshairTexture;
     private Texture centreTexture;
 
     public HighScore(Zoomba zoomba) {
         bubbleTexture = new Texture("bubble.png");
+        powerupTexture = new Texture("powerup.png");
+        hazardTexture = new Texture("hazard.png");
         centreTexture = new Texture("badlogic.jpg");
+
+        crosshairTexture = new Texture("crosshair.png");
 
         this.zoomba = zoomba;
         scoreUi = new ScoreUI(Helper.getAspectWidth(gameHeight), gameHeight);
@@ -75,6 +89,9 @@ public class HighScore implements Screen {
         Manager.getInstance().setCurrentEpoch(Constants.GAME_LENGTH);
         Manager.getInstance().setState(GameState.Ongoing);
 
+        Manager.getInstance().startSpawnTimer();
+        Manager.getInstance().setSpawnEpoch(Constants.SPAWN_INTERVAL);
+
         if (isStart) Manager.getInstance().setDifficulty(0);
         Manager.getInstance().setPoints(Manager.getInstance().getPoints() +
                 Manager.getInstance().getDifficulty() * 10);
@@ -92,6 +109,9 @@ public class HighScore implements Screen {
         for (int i = 0; i < Constants.CIRCLE_INITIAL_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
             spawnedCircles.add(circleFactory.generateCircle(CircleTypes.Slow));
         }
+
+        hazards.add(new HazardFactory().generateHazard(HazardTypes.DecreaseCircleSize));
+        powerups.add(new PowerupFactory().generatePowerup(PowerupTypes.DecreaseCircleSpeed));
     }
 
     @Override
@@ -99,12 +119,11 @@ public class HighScore implements Screen {
 
     }
 
-    public boolean isTolerance(Camera camera, float zoom, Circle circle) {
-        //Gdx.app.log("Tolerance", circle.getX() + " " + circle.getY());
-        return camera.position.x > circle.getX() &&
-                camera.position.x < circle.getX() + 2 * circle.getRadius() &&
-                camera.position.y < circle.getY() + circle.getRadius() &&
-                camera.position.y > circle.getY() - circle.getRadius() &&
+    public boolean isTolerance(Camera camera, float zoom, GameObject gameObject) {
+        return camera.position.x > gameObject.getX() &&
+                camera.position.x < gameObject.getX() + 2 * gameObject.getRadius() &&
+                camera.position.y < gameObject.getY() + gameObject.getRadius() &&
+                camera.position.y > gameObject.getY() - gameObject.getRadius() &&
                 zoom <= 0.025;
     }
 
@@ -115,22 +134,50 @@ public class HighScore implements Screen {
     }
 
     private void handleUpdateLogic() {
+        if (Manager.getInstance().getSpawnEpoch() == 0) {
+            GameObject gameObject = Manager.getInstance().generatePickup();
+            Gdx.app.log(Constants.PICKUP_DEBUG, "Generating pickup and resetting timer");
+
+            if (gameObject.getClass().equals(Powerup.class)) powerups.add((Powerup) gameObject);
+            else if(gameObject.getClass().equals(Hazard.class)) hazards.add((Hazard) gameObject);
+
+            Manager.getInstance().startSpawnTimer();
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.BACK)) {
             getZoomba().setScreen(new MainMenu(getZoomba()));
         }
 
-        Manager.getInstance().checkState(getCircles().size());
+        Manager.getInstance().checkState(getSpawnedCircles().size());
         if (Manager.getInstance().getState().equals(GameState.Loss)) {
             getZoomba().setScreen(new EndGameScreen(getZoomba()));
         } else if (Manager.getInstance().getState().equals(GameState.Win)) {
             spawn(false);
         }
 
-        for (Iterator<Circle> it = getCircles().iterator(); it.hasNext(); ) {
+        for (Iterator<Circle> it = getSpawnedCircles().iterator(); it.hasNext(); ) {
             Circle circle = it.next();
             circle.onMove();
             if (isTolerance(camera, camera.zoom, circle)) {
                 Manager.getInstance().incrementScore(circle);
+                it.remove();
+            }
+        }
+
+        for (Iterator<Powerup> it = getPowerups().iterator(); it.hasNext(); ) {
+            Powerup powerup = it.next();
+            powerup.onMove();
+            if (isTolerance(camera, camera.zoom, powerup)) {
+                powerup.onPickup(getSpawnedCircles());
+                it.remove();
+            }
+        }
+
+        for (Iterator<Hazard> it = getHazards().iterator(); it.hasNext(); ) {
+            Hazard hazard = it.next();
+            hazard.onMove();
+            if (isTolerance(camera, camera.zoom, hazard)) {
+                hazard.onPickup(getSpawnedCircles());
                 it.remove();
             }
         }
@@ -156,17 +203,26 @@ public class HighScore implements Screen {
             getZoomba().getSpriteBatch().draw(centreTexture, 0, -width, width, width);
         }
         //centre of camera for reference
-        getZoomba().getSpriteBatch().draw(centreTexture, camera.position.x - 25,
-                camera.position.y - 25, 50, 50);
+        getZoomba().getSpriteBatch().draw(crosshairTexture, camera.position.x - 50,
+                camera.position.y - 50, 100, 100);
 
-
-        for (Circle circle : getCircles()) {
-            //circle.onMove();
+        for (Circle circle : getSpawnedCircles()) {
             circle.onDraw(bubbleTexture, getZoomba().getSpriteBatch());
         }
+        if (hazards.size() > 0) {
+            for (Hazard hazard : hazards) {
+                hazard.onDraw(hazardTexture, getZoomba().getSpriteBatch());
+            }
+        }
+        if (powerups.size() > 0) {
+            for (Powerup powerup : powerups) {
+                powerup.onDraw(powerupTexture, getZoomba().getSpriteBatch());
+            }
+        }
+
         getZoomba().getSpriteBatch().end();
 
-        scoreUi.onUpdate(Helper.getAspectWidth(gameHeight), gameHeight, getCircles().size());
+        scoreUi.onUpdate(Helper.getAspectWidth(gameHeight), gameHeight, getSpawnedCircles().size());
         scoreUi.onDraw();
     }
 
@@ -195,14 +251,24 @@ public class HighScore implements Screen {
     public void dispose() {
         scoreUi.onDispose();
         bubbleTexture.dispose();
+        hazardTexture.dispose();
+        powerupTexture.dispose();
     }
 
     public Zoomba getZoomba() {
         return zoomba;
     }
 
-    public ArrayList<Circle> getCircles() {
+    public ArrayList<Circle> getSpawnedCircles() {
         return spawnedCircles;
+    }
+
+    public ArrayList<Powerup> getPowerups() {
+        return powerups;
+    }
+
+    public ArrayList<Hazard> getHazards() {
+        return hazards;
     }
 
     private class GestureController implements GestureDetector.GestureListener {

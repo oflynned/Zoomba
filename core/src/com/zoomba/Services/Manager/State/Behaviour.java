@@ -2,6 +2,7 @@ package com.zoomba.Services.Manager.State;
 
 import com.badlogic.gdx.Gdx;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
+import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.Services.Constants;
 import com.zoomba.Services.Manager.Types.Direction;
 import com.zoomba.UI.Modes.HighScore;
@@ -13,56 +14,56 @@ import java.util.Random;
  * Created by ed on 22/08/2016.
  */
 public class Behaviour {
-    public static void generateStateTransition(Direction direction, Circle circle) {
+    public static void generateStateTransition(Direction direction, GameObject gameObject) {
         /**
          * 75% chance of a reflection on colliding with a wall
          * 25% chance of a teleportation through the wall
          *
          * Currently defaulting to collide wall on collision
          */
-        if (new Random().nextInt(10) < 10) collideWall(direction, circle);
-        else passThroughWall(direction, circle);
+        if (new Random().nextInt(10) < 10) collideWall(direction, gameObject);
+        else passThroughWall(direction, gameObject);
     }
 
-    public static void passThroughWall(Direction direction, Circle circle) {
+    public static void passThroughWall(Direction direction, GameObject gameObject) {
         if (direction.equals(Direction.Left)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT PASS THROUGH");
-            circle.setX(HighScore.width - 2 * circle.getRadius() - circle.getVelocity());
-            circle.setY(HighScore.height - circle.getY() - circle.getVelocity());
+            gameObject.setX(HighScore.width - 2 * gameObject.getRadius() - gameObject.getVelocity());
+            gameObject.setY(HighScore.height - gameObject.getY() - gameObject.getVelocity());
         } else if (direction.equals(Direction.Top)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP PASS THROUGH");
-            circle.setX(HighScore.width - circle.getX());
-            circle.setY(circle.getRadius() + circle.getVelocity());
+            gameObject.setX(HighScore.width - gameObject.getX());
+            gameObject.setY(gameObject.getRadius() + gameObject.getVelocity());
         } else if (direction.equals(Direction.Right)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT PASS THROUGH");
-            circle.setX(2 * circle.getRadius() + circle.getVelocity());
-            circle.setY(HighScore.height - circle.getY() - circle.getVelocity());
+            gameObject.setX(2 * gameObject.getRadius() + gameObject.getVelocity());
+            gameObject.setY(HighScore.height - gameObject.getY() - gameObject.getVelocity());
         } else if (direction.equals(Direction.Bottom)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM PASS THROUGH");
-            circle.setX(HighScore.width - circle.getX() - circle.getVelocity());
-            circle.setY(HighScore.height - circle.getRadius() - circle.getVelocity());
+            gameObject.setX(HighScore.width - gameObject.getX() - gameObject.getVelocity());
+            gameObject.setY(HighScore.height - gameObject.getRadius() - gameObject.getVelocity());
         }
     }
 
-    public static void collideWall(Direction direction, Circle circle) {
+    public static void collideWall(Direction direction, GameObject gameObject) {
         if (direction.equals(Direction.Left)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "LEFT COLLISION");
-            circle.setX(circle.getX() + circle.getVelocity());
-            circle.setOrientation(getVerticalBounce(circle.getOrientation()));
+            gameObject.setX(gameObject.getX() + gameObject.getVelocity());
+            gameObject.setOrientation(getVerticalBounce(gameObject.getOrientation()));
         } else if (direction.equals(Direction.Right)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "RIGHT COLLISION");
-            circle.setX(circle.getX() - circle.getVelocity());
-            circle.setOrientation(getVerticalBounce(circle.getOrientation()));
+            gameObject.setX(gameObject.getX() - gameObject.getVelocity());
+            gameObject.setOrientation(getVerticalBounce(gameObject.getOrientation()));
         } else if (direction.equals(Direction.Top)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "TOP COLLISION");
-            circle.setY(circle.getY() - circle.getVelocity());
-            circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
+            gameObject.setY(gameObject.getY() - gameObject.getVelocity());
+            gameObject.setOrientation(getHorizontalBounce(gameObject.getOrientation()));
         } else if (direction.equals(Direction.Bottom)) {
             Gdx.app.log(Constants.PHYSICS_DEBUG, "BOTTOM COLLISION");
-            circle.setY(circle.getY() + circle.getVelocity());
-            circle.setOrientation(getHorizontalBounce(circle.getOrientation()));
+            gameObject.setY(gameObject.getY() + gameObject.getVelocity());
+            gameObject.setOrientation(getHorizontalBounce(gameObject.getOrientation()));
         }
-        Gdx.app.log(Constants.PHYSICS_ATTRIBUTE_DEBUG, circle.getOrientation() + " degrees");
+        Gdx.app.log(Constants.PHYSICS_ATTRIBUTE_DEBUG, gameObject.getOrientation() + " degrees");
     }
 
     public static float getVerticalBounce(float angle) {

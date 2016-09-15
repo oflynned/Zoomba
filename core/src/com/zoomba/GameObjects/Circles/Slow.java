@@ -9,7 +9,7 @@ import com.zoomba.Services.Constants;
  */
 public class Slow extends Circle {
     public Slow(float x, float y) {
-        super(new Vector2(x, y), Constants.RED_500, Constants.SLOW_VELOCITY);
+        super(new Vector2(x, y), Constants.SLOW_VELOCITY);
     }
 
     @Override

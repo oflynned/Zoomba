@@ -24,9 +24,10 @@ public class Constants {
 
     //game duration lengths
     public static final int ONE_SECOND = 100;
+    public static final int SPAWN_INTERVAL = 5 * ONE_SECOND;
+    public static final int PICKUP_EFFECT = 5 * ONE_SECOND;
+    public static final int PICKUP_LIFETIME = 10 * ONE_SECOND;
     public static final int GAME_LENGTH = 30 * ONE_SECOND;
-
-    public static final int PICKUP_EFFECT = ONE_SECOND * 5;
 
     //text scaling
     public static final float TITLE_SCALE = 5;
@@ -40,6 +41,7 @@ public class Constants {
     public static final String PHYSICS_ATTRIBUTE_DEBUG = "PhysicsAttribute";
     public static final String GAME_SCREEN_DEBUG = "HighScore";
     public static final String GESTURE_CONTROLLER_DEBUG = "GestureController";
+    public static final String PICKUP_DEBUG = "Pickup";
     public static final String OBJECT_DEBUG = "GameObject";
 
     //styles

@@ -2,7 +2,13 @@ package com.zoomba.GameObjects.ObjectFactory.Objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import com.zoomba.Services.Constants;
+import com.zoomba.Services.Manager.State.Behaviour;
+import com.zoomba.Services.Manager.Types.Direction;
+import com.zoomba.UI.Modes.HighScore;
 
 import java.util.Random;
 
@@ -83,5 +89,53 @@ public abstract class GameObject {
 
     public static float getRandomOrientation() {
         return new Random().nextInt(360);
+    }
+
+    public void onDraw(Texture texture, Batch batch) {
+        batch.draw(texture, (float) getX(), (float) (getY() - getRadius()),
+                Constants.CIRCLE_RADIUS * 2, Constants.CIRCLE_RADIUS * 2);
+    }
+
+    public void onMove() {
+        if(isCollision()) {
+            onCollision();
+        } else {
+            setX(getX() + getXVel());
+            setY(getY() + getYVel());
+        }
+    }
+
+    public void onCollision() {
+        Gdx.app.log(Constants.OBJECT_DEBUG, "onCollision() @ (" + getX() + "," + getY() +
+                ") (" + getClass() + ")");
+        if(isLeftCollision()) {
+            Behaviour.generateStateTransition(Direction.Left, this);
+        } else if (isTopCollision()) {
+            Behaviour.generateStateTransition(Direction.Top, this);
+        } else if (isRightCollision()) {
+            Behaviour.generateStateTransition(Direction.Right, this);
+        } else if (isBottomCollision()) {
+            Behaviour.generateStateTransition(Direction.Bottom, this);
+        }
+    }
+
+    public boolean isCollision() {
+        return isLeftCollision() || isTopCollision() || isRightCollision() || isBottomCollision();
+    }
+
+    public boolean isLeftCollision() {
+        return getX()<= 0 ;
+    }
+
+    public boolean isTopCollision() {
+        return getY() + getRadius() >= HighScore.height;
+    }
+
+    public boolean isRightCollision() {
+        return getX() + getRadius()*2 >= HighScore.width;
+    }
+
+    public boolean isBottomCollision() {
+        return getY() - getRadius() <= 0;
     }
 }

@@ -1,6 +1,6 @@
 package com.zoomba.Services.Interfaces;
 
-import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 
 import java.util.ArrayList;
 
@@ -8,6 +8,7 @@ import java.util.ArrayList;
  * Created by ed on 29/08/2016.
  */
 public interface Pickup {
-    void onPickup(ArrayList<GameObject> gameObjects);
-    void onDestroy(ArrayList<GameObject> gameObjects);
+    void onUpdate();
+    void onPickup(ArrayList<Circle> circles);
+    void onDestroy(ArrayList<Circle> circles);
 }

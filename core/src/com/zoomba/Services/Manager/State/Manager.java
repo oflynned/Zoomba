@@ -8,21 +8,25 @@ import com.zoomba.GameObjects.ObjectFactory.Factories.HazardFactory;
 import com.zoomba.GameObjects.ObjectFactory.Factories.PowerupFactory;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
+import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Powerup;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Producer;
+import com.zoomba.GameObjects.ObjectFactory.Types.FactoryTypes;
 import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
 import com.zoomba.GameObjects.ObjectFactory.Types.PowerupTypes;
 import com.zoomba.Services.Constants;
 import com.zoomba.Services.Manager.Types.DebugState;
 import com.zoomba.Services.Manager.Types.GameState;
 
+import java.lang.reflect.Array;
 import java.util.Random;
 
 /**
  * Created by ed on 09/08/16.
  */
 public class Manager {
-    private int currentEpoch;
+    private int currentEpoch, spawnEpoch;
     private GameState state;
     private int points;
     private int difficulty;
@@ -38,16 +42,23 @@ public class Manager {
         return manager;
     }
 
-    public float generateCoords(float limit) {
-        return new Random().nextInt((int)limit);
-    }
-
     public void startTimer() {
         setCurrentEpoch(Constants.GAME_LENGTH);
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 currentEpoch--;
+            }
+        }, 1f);
+    }
+
+    public void startSpawnTimer() {
+        Gdx.app.log(Constants.PICKUP_DEBUG, "Starting spawn timer");
+        setSpawnEpoch(Constants.SPAWN_INTERVAL);
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                spawnEpoch--;
             }
         }, 1f);
     }
@@ -70,25 +81,25 @@ public class Manager {
     }
 
     public Powerup generatePowerup(PowerupTypes powerupType) {
-        Gdx.app.debug("Powerup", "Generating powerup: " + powerupType.name());
-        return new PowerupFactory().generatePowerup(powerupType);
+        Gdx.app.log(Constants.PICKUP_DEBUG, "Generating powerup: " + powerupType.name());
+        return Producer.getFactory(FactoryTypes.Powerups).generatePowerup(powerupType);
     }
 
     public Hazard generateHazard(HazardTypes hazardType) {
-        Gdx.app.debug("Hazard", "Generating hazard: " + hazardType.name());
-        return new HazardFactory().generateHazard(hazardType);
+        Gdx.app.log(Constants.PICKUP_DEBUG, "Generating hazard: " + hazardType.name());
+        return Producer.getFactory(FactoryTypes.Hazards).generateHazard(hazardType);
     }
 
-    public void generatePickup() {
+    public GameObject generatePickup() {
         int random = new Random().nextInt(2);
-        if (random == 1) {
-            int randomHazard = HazardTypes.values().length;
+        if (random == 0) {
+            int randomHazard = new Random().nextInt(HazardTypes.values().length);
             HazardTypes[] hazardTypes = HazardTypes.values();
-            generateHazard(hazardTypes[randomHazard]);
+            return generateHazard(hazardTypes[randomHazard]);
         } else {
-            int randomPowerup = PowerupTypes.values().length;
+            int randomPowerup = new Random().nextInt(PowerupTypes.values().length);
             PowerupTypes[] powerupTypes = PowerupTypes.values();
-            generatePowerup(powerupTypes[randomPowerup]);
+            return generatePowerup(powerupTypes[randomPowerup]);
         }
     }
 
@@ -130,5 +141,13 @@ public class Manager {
 
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public int getSpawnEpoch() {
+        return spawnEpoch;
+    }
+
+    public void setSpawnEpoch(int spawnEpoch) {
+        this.spawnEpoch = spawnEpoch;
     }
 }
