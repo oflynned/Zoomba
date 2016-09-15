@@ -3,6 +3,7 @@ package com.zoomba.GameObjects.Hazards;
 import com.badlogic.gdx.Gdx;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
+import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
 import com.zoomba.Services.Constants;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class DecreaseCircleSize extends Hazard {
 
     public DecreaseCircleSize(float x, float y, float radius, float orientation,
                               float velocity, int lifetime, int existence) {
-        super(x, y, radius, orientation, velocity, lifetime, existence);
+        super(x, y, radius, orientation, velocity, lifetime, existence, HazardTypes.DecreaseCircleSize);
         super.startLifetimeTimer();
         Gdx.app.log("Hazard", "Constructor");
     }

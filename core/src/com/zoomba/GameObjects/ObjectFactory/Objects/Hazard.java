@@ -12,11 +12,14 @@ import com.zoomba.Services.Interfaces.PlayerFocus;
  */
 public abstract class Hazard extends GameObject implements Pickup, PlayerFocus {
     private int existence, lifetime;
+    private HazardTypes hazardType;
 
-    public Hazard(float x, float y, float radius, float orientation, float velocity, int lifetime, int existence) {
+    public Hazard(float x, float y, float radius, float orientation, float velocity, int lifetime,
+                  int existence, HazardTypes hazardType) {
         super(new Vector2(x, y), radius, orientation, velocity);
         this.lifetime = lifetime;
         this.existence = existence;
+        this.hazardType = hazardType;
         startLifetimeTimer();
     }
 
@@ -48,11 +51,7 @@ public abstract class Hazard extends GameObject implements Pickup, PlayerFocus {
         return lifetime;
     }
 
-    public static boolean getType(HazardTypes hazardType) {
-        for (HazardTypes hazardType1 : HazardTypes.values()) {
-            if (hazardType1.equals(hazardType))
-                return true;
-        }
-        return false;
+    public HazardTypes getHazardType() {
+        return hazardType;
     }
 }

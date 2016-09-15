@@ -13,8 +13,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.zoomba.GameObjects.ObjectFactory.Factories.HazardFactory;
-import com.zoomba.GameObjects.ObjectFactory.Factories.PowerupFactory;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
 import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
@@ -57,17 +55,43 @@ public class HighScore implements Screen {
     private GestureController gestureController;
     private Viewport viewport;
 
-    private Texture bubbleTexture, hazardTexture, powerupTexture;
+    private Texture bubbleTexture;
+    private Texture hazardTexture, powerupTexture;
+
+    //hazards
+    private Texture decreaseCircleSizeTexture, decreaseScrollTexture, decreaseZoomSpeedTexture,
+            increaseCircleSpeedTexture, instantLossTexture, invertibilityTexture, invisibilityTexture;
+    //powerups
+    private Texture decreaseCircleSpeedTexture, increaseCircleSizeTexture, increaseScrollSpeedTexture,
+            increaseZoomSpeedTexture;
+
+    //circles
+
     private Texture crosshairTexture;
-    private Texture centreTexture;
+    private Texture debugTexture;
 
     public HighScore(Zoomba zoomba) {
+        //test textures
         bubbleTexture = new Texture("bubble.png");
-        powerupTexture = new Texture("powerup.png");
-        hazardTexture = new Texture("hazard.png");
-        centreTexture = new Texture("badlogic.jpg");
-        //for debug, will be removed in release iteration
+        debugTexture = new Texture("badlogic.jpg");
+
+        //for debug for zooming to centre, will be removed in release iteration
         crosshairTexture = new Texture("crosshair.png");
+
+        //hazards
+        decreaseCircleSizeTexture = new Texture("haz_1.png");
+        decreaseScrollTexture = new Texture("haz_2.png");
+        decreaseZoomSpeedTexture = new Texture("haz_3.png");
+        increaseCircleSpeedTexture = new Texture("haz_4.png");
+        instantLossTexture = new Texture("haz_5.png");
+        invertibilityTexture = new Texture("haz_6.png");
+        invisibilityTexture = new Texture("haz_7.png");
+
+        //powerups
+        decreaseCircleSpeedTexture = new Texture("pow_1.png");
+        increaseCircleSizeTexture = new Texture("pow_2.png");
+        increaseScrollSpeedTexture = new Texture("pow_3.png");
+        increaseZoomSpeedTexture = new Texture("pow_4.png");
 
         this.zoomba = zoomba;
         scoreUi = new ScoreUI(Helper.getAspectWidth(gameHeight), gameHeight);
@@ -118,7 +142,7 @@ public class HighScore implements Screen {
                 camera.position.x < gameObject.getX() + 2 * gameObject.getRadius() &&
                 camera.position.y < gameObject.getY() + gameObject.getRadius() &&
                 camera.position.y > gameObject.getY() - gameObject.getRadius() &&
-                zoom <= 0.025;
+                zoom <= 0.1f;
     }
 
     @Override
@@ -128,14 +152,13 @@ public class HighScore implements Screen {
     }
 
     private void handleUpdateLogic() {
-        if (Manager.getInstance().getSpawnEpoch() == 0) {
+        if (Manager.getInstance().getSpawnEpoch() == 0 && Manager.getInstance().getCurrentEpoch() > 0) {
             GameObject gameObject = Manager.getInstance().generatePickup();
-            Gdx.app.log(Constants.PICKUP_DEBUG, "Generating pickup and resetting timer");
 
-            Class<?> gameObjectClass = gameObject.getClass();
-
-            if (gameObjectClass.getSuperclass().equals(Powerup.class)) powerups.add((Powerup) gameObject);
-            else if(gameObjectClass.getSuperclass().equals(Hazard.class)) hazards.add((Hazard) gameObject);
+            if (gameObject.getClass().getSuperclass().equals(Powerup.class))
+                powerups.add((Powerup) gameObject);
+            else if (gameObject.getClass().getSuperclass().equals(Hazard.class))
+                hazards.add((Hazard) gameObject);
 
             Manager.getInstance().startSpawnTimer();
         }
@@ -190,24 +213,48 @@ public class HighScore implements Screen {
         if (Manager.getInstance().getDebugState().equals(DebugState.Walls)) {
             //draw walls
             //left
-            getZoomba().getSpriteBatch().draw(centreTexture, -height, 0, height, height);
+            getZoomba().getSpriteBatch().draw(debugTexture, -height, 0, height, height);
             //right
-            getZoomba().getSpriteBatch().draw(centreTexture, width, 0, height, height);
+            getZoomba().getSpriteBatch().draw(debugTexture, width, 0, height, height);
             //top
-            getZoomba().getSpriteBatch().draw(centreTexture, 0, height, width, width);
+            getZoomba().getSpriteBatch().draw(debugTexture, 0, height, width, width);
             //bottom
-            getZoomba().getSpriteBatch().draw(centreTexture, 0, -width, width, width);
+            getZoomba().getSpriteBatch().draw(debugTexture, 0, -width, width, width);
         }
 
         //draw game objects to the buffer by sprite batch
         for (Circle circle : getSpawnedCircles()) {
             circle.onDraw(bubbleTexture, getZoomba().getSpriteBatch());
         }
+
         for (Hazard hazard : hazards) {
-            hazard.onDraw(hazardTexture, getZoomba().getSpriteBatch());
+            if (hazard.getHazardType().equals(HazardTypes.DecreaseCircleSize)) {
+                hazard.onDraw(decreaseCircleSizeTexture, getZoomba().getSpriteBatch());
+            } else if (hazard.getHazardType().equals(HazardTypes.DecreaseScrollSpeed)) {
+                hazard.onDraw(decreaseScrollTexture, getZoomba().getSpriteBatch());
+            } else if (hazard.getHazardType().equals(HazardTypes.DecreaseZoomSpeed)) {
+                hazard.onDraw(decreaseZoomSpeedTexture, getZoomba().getSpriteBatch());
+            } else if (hazard.getHazardType().equals(HazardTypes.IncreaseCircleSpeed)) {
+                hazard.onDraw(increaseCircleSpeedTexture, getZoomba().getSpriteBatch());
+            } else if (hazard.getHazardType().equals(HazardTypes.InstantLoss)) {
+                hazard.onDraw(instantLossTexture, getZoomba().getSpriteBatch());
+            } else if (hazard.getHazardType().equals(HazardTypes.Invertibility)) {
+                hazard.onDraw(invertibilityTexture, getZoomba().getSpriteBatch());
+            } else if (hazard.getHazardType().equals(HazardTypes.Invisibility)) {
+                hazard.onDraw(invisibilityTexture, getZoomba().getSpriteBatch());
+            }
         }
+
         for (Powerup powerup : powerups) {
-            powerup.onDraw(powerupTexture, getZoomba().getSpriteBatch());
+            if (powerup.getPowerupType().equals(PowerupTypes.IncreaseZoomSpeed)) {
+                powerup.onDraw(increaseZoomSpeedTexture, getZoomba().getSpriteBatch());
+            } else if (powerup.getPowerupType().equals(PowerupTypes.IncreaseScrollSpeed)) {
+                powerup.onDraw(increaseScrollSpeedTexture, getZoomba().getSpriteBatch());
+            } else if (powerup.getPowerupType().equals(PowerupTypes.IncreaseCircleSize)) {
+                powerup.onDraw(increaseCircleSizeTexture, getZoomba().getSpriteBatch());
+            } else if (powerup.getPowerupType().equals(PowerupTypes.DecreaseCircleSpeed)) {
+                powerup.onDraw(decreaseCircleSpeedTexture, getZoomba().getSpriteBatch());
+            }
         }
 
         //centre of camera for reference
@@ -267,7 +314,7 @@ public class HighScore implements Screen {
 
     private class GestureController implements GestureDetector.GestureListener {
         float velX, velY, velZ;
-        boolean fling = false, zoom = false, isInwards = false;
+        boolean fling = false;
 
         @Override
         public boolean touchDown(float x, float y, int pointer, int button) {
@@ -313,8 +360,12 @@ public class HighScore implements Screen {
         @Override
         public boolean zoom(float initialDistance, float distance) {
             velZ = (initialDistance / distance);
-            zoom = true;
-            isInwards = velZ < 1;
+            //smooth zoom by taking enumeration of touch points over time
+            camera.zoom += velZ < 1 ? -velZ * 0.01f : velZ * 0.01f;
+
+            //anchor to max and min
+            camera.zoom = camera.zoom < 0.05f ? 0.05f : camera.zoom;
+            camera.zoom = camera.zoom > 2 ? 2 : camera.zoom;
 
             return true;
         }
@@ -331,19 +382,8 @@ public class HighScore implements Screen {
         }
 
         public void update() {
-            //Gdx.app.log("Zoom", "Zoom: " + camera.zoom + ", velZ: " + velZ);
-            if (zoom) {
-                velZ *= 0.98f;
-                velZ = Math.abs(velZ) < 0.01f ? 0 : velZ;
+            System.out.println(camera.zoom);
 
-                zoom = !(velZ == 0);
-
-                camera.zoom += isInwards ? -velZ : velZ;
-                camera.zoom = camera.zoom < 0.01f ? 0.01f : camera.zoom;
-                camera.zoom = camera.zoom > 1f ? 1f : camera.zoom;
-
-                zoom = !(camera.zoom == 0.01f || camera.zoom == 1f);
-            }
             if (fling) {
                 velX *= 0.98f;
                 velY *= 0.98f;

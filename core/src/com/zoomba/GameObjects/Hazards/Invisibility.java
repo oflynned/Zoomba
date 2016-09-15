@@ -2,6 +2,7 @@ package com.zoomba.GameObjects.Hazards;
 
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
+import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
 
 import java.util.ArrayList;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  */
 public class Invisibility extends Hazard {
     public Invisibility(float x, float y, float radius, float orientation, float velocity, int lifetime, int existence) {
-        super(x, y, radius, orientation, velocity, lifetime, existence);
+        super(x, y, radius, orientation, velocity, lifetime, existence, HazardTypes.Invisibility);
     }
 
     @Override

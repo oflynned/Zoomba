@@ -3,6 +3,7 @@ package com.zoomba.Powerups;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Powerup;
+import com.zoomba.GameObjects.ObjectFactory.Types.PowerupTypes;
 
 import java.util.ArrayList;
 
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 public class IncreaseScrollSpeed extends Powerup {
     public IncreaseScrollSpeed(float x, float y, float radius, float orientation, float velocity,
                                int lifetime, int existence) {
-        super(x, y, radius, orientation, velocity, lifetime, existence);
+        super(x, y, radius, orientation, velocity, lifetime, existence, PowerupTypes.IncreaseScrollSpeed);
     }
 
     @Override
