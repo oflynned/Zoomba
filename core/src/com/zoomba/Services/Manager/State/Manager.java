@@ -53,7 +53,6 @@ public class Manager {
     }
 
     public void startSpawnTimer() {
-        Gdx.app.log(Constants.PICKUP_DEBUG, "Starting spawn timer");
         setSpawnEpoch(Constants.SPAWN_INTERVAL);
         Timer.schedule(new Timer.Task() {
             @Override
@@ -66,6 +65,7 @@ public class Manager {
     public void checkState(int entityCount) {
         if(getCurrentEpoch() > Constants.ONE_SECOND) {
             currentEpoch--;
+            spawnEpoch--;
             state = entityCount > 0 ? GameState.Ongoing : GameState.Win;
         } else {
             state = entityCount > 0 ? GameState.Loss : GameState.Win;

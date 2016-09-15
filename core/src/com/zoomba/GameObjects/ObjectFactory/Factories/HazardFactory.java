@@ -46,6 +46,7 @@ public class HazardFactory extends Factory {
         int existence = Constants.PICKUP_EFFECT;
 
         if (hazardTypes.equals(HazardTypes.DecreaseCircleSize)) {
+            Gdx.app.log(Constants.PICKUP_DEBUG, "Generating " + HazardTypes.DecreaseCircleSize.name());
             return new DecreaseCircleSize(x, y, radius, orientation, velocity, lifetime, existence);
         } else if (hazardTypes.equals(HazardTypes.DecreaseScrollSpeed)) {
             return new DecreaseScrollSpeed(x, y, radius, orientation, velocity, lifetime, existence);

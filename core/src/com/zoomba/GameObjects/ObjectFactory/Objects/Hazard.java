@@ -3,6 +3,7 @@ package com.zoomba.GameObjects.ObjectFactory.Objects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Timer;
+import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
 import com.zoomba.Services.Interfaces.Pickup;
 import com.zoomba.Services.Interfaces.PlayerFocus;
 
@@ -20,22 +21,21 @@ public abstract class Hazard extends GameObject implements Pickup, PlayerFocus {
     }
 
     public void startExistenceTimer() {
+        Gdx.app.log("Timer", "Starting lifetime timer");
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 existence--;
-                Gdx.app.debug("Hazard", existence + "s in existence");
             }
         }, 1f);
     }
 
     public void startLifetimeTimer() {
-        Gdx.app.log("Hazard", "Starting lifetime timer");
+        Gdx.app.log("Timer", "Starting lifetime timer");
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 lifetime--;
-                Gdx.app.log("Hazard", lifetime + "s in lifetime");
             }
         }, 1f);
     }
@@ -46,5 +46,13 @@ public abstract class Hazard extends GameObject implements Pickup, PlayerFocus {
 
     public int getLifetime() {
         return lifetime;
+    }
+
+    public static boolean getType(HazardTypes hazardType) {
+        for (HazardTypes hazardType1 : HazardTypes.values()) {
+            if (hazardType1.equals(hazardType))
+                return true;
+        }
+        return false;
     }
 }

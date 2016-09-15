@@ -66,7 +66,7 @@ public class HighScore implements Screen {
         powerupTexture = new Texture("powerup.png");
         hazardTexture = new Texture("hazard.png");
         centreTexture = new Texture("badlogic.jpg");
-
+        //for debug, will be removed in release iteration
         crosshairTexture = new Texture("crosshair.png");
 
         this.zoomba = zoomba;
@@ -86,11 +86,8 @@ public class HighScore implements Screen {
 
     public void spawn(boolean isStart) {
         Manager.getInstance().startTimer();
-        Manager.getInstance().setCurrentEpoch(Constants.GAME_LENGTH);
-        Manager.getInstance().setState(GameState.Ongoing);
-
         Manager.getInstance().startSpawnTimer();
-        Manager.getInstance().setSpawnEpoch(Constants.SPAWN_INTERVAL);
+        Manager.getInstance().setState(GameState.Ongoing);
 
         if (isStart) Manager.getInstance().setDifficulty(0);
         Manager.getInstance().setPoints(Manager.getInstance().getPoints() +
@@ -109,9 +106,6 @@ public class HighScore implements Screen {
         for (int i = 0; i < Constants.CIRCLE_INITIAL_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
             spawnedCircles.add(circleFactory.generateCircle(CircleTypes.Slow));
         }
-
-        hazards.add(new HazardFactory().generateHazard(HazardTypes.DecreaseCircleSize));
-        powerups.add(new PowerupFactory().generatePowerup(PowerupTypes.DecreaseCircleSpeed));
     }
 
     @Override
@@ -138,8 +132,10 @@ public class HighScore implements Screen {
             GameObject gameObject = Manager.getInstance().generatePickup();
             Gdx.app.log(Constants.PICKUP_DEBUG, "Generating pickup and resetting timer");
 
-            if (gameObject.getClass().equals(Powerup.class)) powerups.add((Powerup) gameObject);
-            else if(gameObject.getClass().equals(Hazard.class)) hazards.add((Hazard) gameObject);
+            Class<?> gameObjectClass = gameObject.getClass();
+
+            if (gameObjectClass.getSuperclass().equals(Powerup.class)) powerups.add((Powerup) gameObject);
+            else if(gameObjectClass.getSuperclass().equals(Hazard.class)) hazards.add((Hazard) gameObject);
 
             Manager.getInstance().startSpawnTimer();
         }
@@ -202,23 +198,21 @@ public class HighScore implements Screen {
             //bottom
             getZoomba().getSpriteBatch().draw(centreTexture, 0, -width, width, width);
         }
-        //centre of camera for reference
-        getZoomba().getSpriteBatch().draw(crosshairTexture, camera.position.x - 50,
-                camera.position.y - 50, 100, 100);
 
+        //draw game objects to the buffer by sprite batch
         for (Circle circle : getSpawnedCircles()) {
             circle.onDraw(bubbleTexture, getZoomba().getSpriteBatch());
         }
-        if (hazards.size() > 0) {
-            for (Hazard hazard : hazards) {
-                hazard.onDraw(hazardTexture, getZoomba().getSpriteBatch());
-            }
+        for (Hazard hazard : hazards) {
+            hazard.onDraw(hazardTexture, getZoomba().getSpriteBatch());
         }
-        if (powerups.size() > 0) {
-            for (Powerup powerup : powerups) {
-                powerup.onDraw(powerupTexture, getZoomba().getSpriteBatch());
-            }
+        for (Powerup powerup : powerups) {
+            powerup.onDraw(powerupTexture, getZoomba().getSpriteBatch());
         }
+
+        //centre of camera for reference
+        getZoomba().getSpriteBatch().draw(crosshairTexture, camera.position.x - 100,
+                camera.position.y - 100, 200, 200);
 
         getZoomba().getSpriteBatch().end();
 
@@ -337,7 +331,7 @@ public class HighScore implements Screen {
         }
 
         public void update() {
-            Gdx.app.log("Zoom", "Zoom: " + camera.zoom + ", velZ: " + velZ);
+            //Gdx.app.log("Zoom", "Zoom: " + camera.zoom + ", velZ: " + velZ);
             if (zoom) {
                 velZ *= 0.98f;
                 velZ = Math.abs(velZ) < 0.01f ? 0 : velZ;

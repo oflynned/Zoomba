@@ -10,7 +10,7 @@ public class Constants {
     public static final float CIRCLE_INCREASED_RADIUS = 75;
     public static final float CIRCLE_RADIUS = 50;
     public static final float CIRCLE_REDUCED_RADIUS = 25;
-    public static final int CIRCLE_INITIAL_AMOUNT = 2;
+    public static final int CIRCLE_INITIAL_AMOUNT = 1;
 
     public static final float SLOW_VELOCITY = 2;
     public static final int SLOW_POINTS = (int) (SLOW_VELOCITY * 10);
