@@ -17,9 +17,10 @@ public class Behaviour {
         /**
          * 75% chance of a reflection on colliding with a wall
          * 25% chance of a teleportation through the wall
+         *
+         * Currently defaulting to collide wall on collision
          */
-        int rand = new Random().nextInt(10);
-        if (rand < 10) collideWall(direction, circle);
+        if (new Random().nextInt(10) < 10) collideWall(direction, circle);
         else passThroughWall(direction, circle);
     }
 

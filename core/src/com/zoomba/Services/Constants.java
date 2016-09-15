@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.Color;
  */
 public class Constants {
     //circle attributes
+    public static final float CIRCLE_INCREASED_RADIUS = 75;
     public static final float CIRCLE_RADIUS = 50;
+    public static final float CIRCLE_REDUCED_RADIUS = 25;
     public static final int CIRCLE_INITIAL_AMOUNT = 2;
 
     public static final float SLOW_VELOCITY = 2;
@@ -23,6 +25,8 @@ public class Constants {
     //game duration lengths
     public static final int ONE_SECOND = 100;
     public static final int GAME_LENGTH = 30 * ONE_SECOND;
+
+    public static final int PICKUP_EFFECT = ONE_SECOND * 5;
 
     //text scaling
     public static final float TITLE_SCALE = 5;

@@ -1,41 +1,35 @@
 package com.zoomba.GameObjects.ObjectFactory.Objects;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Timer;
+import com.zoomba.Services.Interfaces.Pickup;
 
 /**
  * Created by ed on 29/08/2016.
  */
-public abstract class Hazard extends GameObject {
-    private long lifetime;
-    private long effectLifetime;
-    private boolean isEffect;
+public abstract class Hazard extends GameObject implements Pickup {
+    private int existence, lifetime;
 
-    public Hazard(float x, float y, float radius, float orientation, Color color, float velocity) {
-        super(new Vector2(x, y), radius, orientation, color, velocity);
-    }
-
-    public Hazard(float x, float y, float radius, float orientation, Color color, float velocity,
-                  long lifetime, long effectLifetime) {
-        super(new Vector2(x, y), radius, orientation, color, velocity);
+    public Hazard(float x, float y, float radius, float orientation, float velocity, int lifetime, int existence) {
+        super(new Vector2(x, y), radius, orientation, velocity);
         this.lifetime = lifetime;
-        this.effectLifetime = effectLifetime;
-        this.isEffect = false;
+        this.existence = existence;
     }
 
-    public void exist() {
-        //countdown existence if invoked or not
+    public void startTimer() {
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                existence--;
+            }
+        }, 1f);
     }
 
-    public long getLifetime() {
+    public int getExistence() {
+        return existence;
+    }
+
+    public int getLifetime() {
         return lifetime;
-    }
-
-    public long getEffectLifetime() {
-        return effectLifetime;
-    }
-
-    public boolean isEffect() {
-        return isEffect;
     }
 }

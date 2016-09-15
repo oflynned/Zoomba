@@ -1,7 +1,7 @@
 package com.zoomba.GameObjects.ObjectFactory.Factories;
 
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
-import com.zoomba.GameObjects.ObjectFactory.Types.ObjectTypes;
+import com.zoomba.GameObjects.ObjectFactory.Types.CircleTypes;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
 
 /**
@@ -9,7 +9,7 @@ import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
  */
 public class PowerupFactory extends Factory {
     @Override
-    public Circle generateCircle(ObjectTypes objectType) {
+    public Circle generateCircle(CircleTypes objectType) {
         return null;
     }
 }

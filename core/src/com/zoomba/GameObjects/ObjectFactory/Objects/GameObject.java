@@ -15,13 +15,11 @@ public abstract class GameObject {
     Vector2 position;
     double velocity;
     float radius, orientation;
-    Color color;
 
-    public GameObject(Vector2 position, float radius, float orientation, Color color, float velocity) {
+    public GameObject(Vector2 position, float radius, float orientation, float velocity) {
         this.position = position;
         this.radius = radius;
         this.orientation = orientation;
-        this.color = color;
         this.velocity = velocity;
     }
 
@@ -55,6 +53,18 @@ public abstract class GameObject {
         return position.y;
     }
 
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+
+    public void setVelocity(double velocity) {
+        this.velocity = velocity;
+    }
+
+    public void setRadius(float radius) {
+        this.radius = radius;
+    }
+
     public float getRadius() {
         return radius;
     }
@@ -73,9 +83,5 @@ public abstract class GameObject {
 
     public static float getRandomOrientation() {
         return new Random().nextInt(360);
-    }
-
-    public Color getColor() {
-        return color;
     }
 }

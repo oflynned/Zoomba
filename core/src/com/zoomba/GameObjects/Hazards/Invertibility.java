@@ -1,25 +1,26 @@
 package com.zoomba.GameObjects.Hazards;
 
-import com.badlogic.gdx.graphics.Color;
+import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
-import com.zoomba.Services.Constants;
-import com.zoomba.Services.Interfaces.Pickup;
+
+import java.util.ArrayList;
 
 /**
  * Created by ed on 29/08/2016.
  */
-public class Invertibility extends Hazard implements Pickup {
-    private static final long EFFECT_TIME = Constants.ONE_SECOND * 5;
-
-    public Invertibility(float x, float y, float radius, float orientation, Color color, float velocity,
-                  long lifetime, long effectLifetime) {
-        super(x, y, radius, orientation, color, velocity, lifetime, effectLifetime);
+public class Invertibility extends Hazard {
+    public Invertibility(float x, float y, float radius, float orientation, float velocity,
+                         int lifetime, int existence) {
+        super(x, y, radius, orientation, velocity, lifetime, existence);
     }
 
     @Override
-    public void effect() {
-        // scrolling left inverts to scrolling right
-        // scrolling up inverts to scrolling down
-        // ...
+    public void onPickup(ArrayList<GameObject> gameObjects) {
+
+    }
+
+    @Override
+    public void onDestroy(ArrayList<GameObject> gameObjects) {
+
     }
 }

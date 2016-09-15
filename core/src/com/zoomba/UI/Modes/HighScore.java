@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -18,7 +17,7 @@ import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Producer;
 import com.zoomba.GameObjects.ObjectFactory.Types.FactoryTypes;
-import com.zoomba.GameObjects.ObjectFactory.Types.ObjectTypes;
+import com.zoomba.GameObjects.ObjectFactory.Types.CircleTypes;
 import com.zoomba.GameObjects.UI.ScoreUI;
 import com.zoomba.Services.Constants;
 import com.zoomba.Services.Manager.Gesture.Helper;
@@ -75,9 +74,8 @@ public class HighScore implements Screen {
         Manager.getInstance().startTimer();
         Manager.getInstance().setCurrentEpoch(Constants.GAME_LENGTH);
         Manager.getInstance().setState(GameState.Ongoing);
-        if (isStart) {
-            Manager.getInstance().setDifficulty(0);
-        }
+
+        if (isStart) Manager.getInstance().setDifficulty(0);
         Manager.getInstance().setPoints(Manager.getInstance().getPoints() +
                 Manager.getInstance().getDifficulty() * 10);
         Manager.getInstance().setDifficulty(Manager.getInstance().getDifficulty() + 1);
@@ -89,10 +87,10 @@ public class HighScore implements Screen {
         assert circleFactory != null;
 
         spawnedCircles.clear();
-        circleFactory.generateCircle(ObjectTypes.Slow);
+        circleFactory.generateCircle(CircleTypes.Slow);
 
         for (int i = 0; i < Constants.CIRCLE_INITIAL_AMOUNT * Manager.getInstance().getDifficulty(); i++) {
-            spawnedCircles.add(circleFactory.generateCircle(ObjectTypes.Slow));
+            spawnedCircles.add(circleFactory.generateCircle(CircleTypes.Slow));
         }
     }
 

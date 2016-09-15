@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.zoomba.Services.Manager.State.Manager;
 import com.zoomba.UI.Modes.HighScore;
 import com.zoomba.UI.Screens.MainMenu;
 
@@ -15,7 +16,7 @@ public class Zoomba extends Game {
 	@Override
 	public void create () {
 		spriteBatch = new SpriteBatch();
-		setScreen(new MainMenu(this));
+		setScreen(new HighScore(this));
 	}
 
 	@Override

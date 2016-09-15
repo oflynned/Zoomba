@@ -4,7 +4,13 @@ import com.zoomba.GameObjects.Circles.Fast;
 import com.zoomba.GameObjects.Circles.Slow;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Factory;
-import com.zoomba.GameObjects.ObjectFactory.Types.ObjectTypes;
+import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
+import com.zoomba.GameObjects.ObjectFactory.Objects.Powerup;
+import com.zoomba.GameObjects.ObjectFactory.Types.CircleTypes;
+import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
+import com.zoomba.GameObjects.ObjectFactory.Types.PowerupTypes;
+import com.zoomba.Services.Manager.State.Manager;
 import com.zoomba.UI.Modes.HighScore;
 
 import java.util.Random;
@@ -15,19 +21,22 @@ import java.util.Random;
 public class CircleFactory extends Factory {
 
     @Override
-    public Circle generateCircle(ObjectTypes objectType) {
-        float x = generateCoords(HighScore.width);
-        float y = generateCoords(HighScore.height);
-
-        if (objectType.equals(ObjectTypes.Slow))
-            return new Slow(x, y);
-        else if (objectType.equals(ObjectTypes.Fast))
-            return new Fast(x, y);
+    public Circle generateCircle(CircleTypes objectType) {
+        if (objectType.equals(CircleTypes.Slow))
+            return new Slow(GameObject.getRandomX(), GameObject.getRandomY());
+        else if (objectType.equals(CircleTypes.Fast))
+            return new Fast(GameObject.getRandomX(), GameObject.getRandomY());
         else return null;
     }
 
-    private static float generateCoords(float limit) {
-        return new Random().nextInt((int)limit);
+    @Override
+    public Powerup generatePowerup(PowerupTypes powerupTypes) {
+        return null;
+    }
+
+    @Override
+    public Hazard generateHazard(HazardTypes hazardTypes) {
+        return null;
     }
 
 }

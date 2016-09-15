@@ -19,8 +19,8 @@ import com.zoomba.UI.Modes.HighScore;
  */
 public abstract class Circle extends GameObject implements PlayerFocus {
 
-    public Circle(Vector2 position, Color color, float velocity) {
-        super(position, Constants.CIRCLE_RADIUS, GameObject.getRandomOrientation(), color, velocity);
+    public Circle(Vector2 position, float velocity) {
+        super(position, Constants.CIRCLE_RADIUS, GameObject.getRandomOrientation(), velocity);
         onSpawn();
     }
 
