@@ -43,7 +43,7 @@ public class HazardFactory extends Factory {
         float radius = Constants.CIRCLE_RADIUS;
         float velocity = Constants.SLOW_VELOCITY;
         int lifetime = Constants.PICKUP_EFFECT;
-        int existence = Constants.PICKUP_EFFECT;
+        int existence = Constants.GAME_LENGTH; //Constants.PICKUP_EFFECT * 2;
 
         if (hazardTypes.equals(HazardTypes.DecreaseCircleSize)) {
             Gdx.app.log(Constants.PICKUP_DEBUG, "Generating " + HazardTypes.DecreaseCircleSize.name());

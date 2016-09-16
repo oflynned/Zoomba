@@ -13,6 +13,11 @@ public class Slow extends Circle {
     }
 
     @Override
+    public void onUpdate() {
+
+    }
+
+    @Override
     public void onFocus() {
 
     }

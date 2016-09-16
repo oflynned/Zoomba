@@ -29,6 +29,8 @@ public abstract class GameObject {
         this.velocity = velocity;
     }
 
+    public abstract void onUpdate();
+
     public void setX(double x) {
         this.position.x = (float) x;
     }
@@ -92,8 +94,7 @@ public abstract class GameObject {
     }
 
     public void onDraw(Texture texture, Batch batch) {
-        batch.draw(texture, (float) getX(), (float) (getY() - getRadius()),
-                Constants.CIRCLE_RADIUS * 2, Constants.CIRCLE_RADIUS * 2);
+        batch.draw(texture, (float) getX(), (float) (getY() - getRadius()), getRadius() * 2, getRadius() * 2);
     }
 
     public void onMove() {

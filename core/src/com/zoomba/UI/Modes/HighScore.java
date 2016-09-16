@@ -55,8 +55,6 @@ public class HighScore implements Screen {
     private GestureController gestureController;
     private Viewport viewport;
 
-    private Texture bubbleTexture;
-
     //hazards
     private Texture decreaseCircleSizeTexture, decreaseScrollTexture, decreaseZoomSpeedTexture,
             increaseCircleSpeedTexture, instantLossTexture, invertibilityTexture, invisibilityTexture;
@@ -65,6 +63,7 @@ public class HighScore implements Screen {
             increaseZoomSpeedTexture;
 
     //circles
+    private Texture bubbleTexture;
 
     private Texture crosshairTexture;
     private Texture debugTexture;
@@ -151,7 +150,8 @@ public class HighScore implements Screen {
 
     private void handleUpdateLogic() {
         if (Manager.getInstance().getSpawnEpoch() == 0 && Manager.getInstance().getCurrentEpoch() > 0) {
-            GameObject gameObject = Manager.getInstance().generatePickup();
+            GameObject gameObject = Manager.getInstance().generateHazard(HazardTypes.DecreaseCircleSize);
+            //Manager.getInstance().generatePickup();
 
             if (gameObject.getClass().getSuperclass().equals(Powerup.class))
                 powerups.add((Powerup) gameObject);
@@ -172,7 +172,7 @@ public class HighScore implements Screen {
             spawn(false);
         }
 
-        for (Iterator<Circle> it = getSpawnedCircles().iterator(); it.hasNext(); ) {
+        for (Iterator<Circle> it = getSpawnedCircles().iterator(); it.hasNext();) {
             Circle circle = it.next();
             circle.onMove();
             if (isTolerance(camera, camera.zoom, circle)) {
@@ -181,7 +181,7 @@ public class HighScore implements Screen {
             }
         }
 
-        for (Iterator<Powerup> it = getPowerups().iterator(); it.hasNext(); ) {
+        for (Iterator<Powerup> it = getPowerups().iterator(); it.hasNext();) {
             Powerup powerup = it.next();
             powerup.onMove();
             if (isTolerance(camera, camera.zoom, powerup)) {
@@ -190,13 +190,21 @@ public class HighScore implements Screen {
             }
         }
 
-        for (Iterator<Hazard> it = getHazards().iterator(); it.hasNext(); ) {
+        for (Iterator<Hazard> it = getHazards().iterator(); it.hasNext();) {
             Hazard hazard = it.next();
+            hazard.onUpdate();
             hazard.onMove();
-            if (isTolerance(camera, camera.zoom, hazard)) {
+            if (isTolerance(camera, camera.zoom, hazard) && !hazard.isPickupUp()) {
                 hazard.onPickup(getSpawnedCircles());
+                hazard.setPickupUp(true);
+            }
+            if (!hazard.isAlive()) {
+                hazard.onDestroy(getSpawnedCircles());
                 it.remove();
             }
+            Gdx.app.log("Hazard", "Hazard: existence " + hazard.getExistence() +
+                    ", lifetime: " + hazard.getLifetime() +
+                    ", invoked: " + hazard.isInvoked() + ", alive: " + hazard.isAlive());
         }
     }
 
@@ -226,20 +234,22 @@ public class HighScore implements Screen {
         }
 
         for (Hazard hazard : hazards) {
-            if (hazard.getHazardType().equals(HazardTypes.DecreaseCircleSize)) {
-                hazard.onDraw(decreaseCircleSizeTexture, getZoomba().getSpriteBatch());
-            } else if (hazard.getHazardType().equals(HazardTypes.DecreaseScrollSpeed)) {
-                hazard.onDraw(decreaseScrollTexture, getZoomba().getSpriteBatch());
-            } else if (hazard.getHazardType().equals(HazardTypes.DecreaseZoomSpeed)) {
-                hazard.onDraw(decreaseZoomSpeedTexture, getZoomba().getSpriteBatch());
-            } else if (hazard.getHazardType().equals(HazardTypes.IncreaseCircleSpeed)) {
-                hazard.onDraw(increaseCircleSpeedTexture, getZoomba().getSpriteBatch());
-            } else if (hazard.getHazardType().equals(HazardTypes.InstantLoss)) {
-                hazard.onDraw(instantLossTexture, getZoomba().getSpriteBatch());
-            } else if (hazard.getHazardType().equals(HazardTypes.Invertibility)) {
-                hazard.onDraw(invertibilityTexture, getZoomba().getSpriteBatch());
-            } else if (hazard.getHazardType().equals(HazardTypes.Invisibility)) {
-                hazard.onDraw(invisibilityTexture, getZoomba().getSpriteBatch());
+            if (!hazard.isPickupUp()) {
+                if (hazard.getHazardType().equals(HazardTypes.DecreaseCircleSize)) {
+                    hazard.onDraw(decreaseCircleSizeTexture, getZoomba().getSpriteBatch());
+                } else if (hazard.getHazardType().equals(HazardTypes.DecreaseScrollSpeed)) {
+                    hazard.onDraw(decreaseScrollTexture, getZoomba().getSpriteBatch());
+                } else if (hazard.getHazardType().equals(HazardTypes.DecreaseZoomSpeed)) {
+                    hazard.onDraw(decreaseZoomSpeedTexture, getZoomba().getSpriteBatch());
+                } else if (hazard.getHazardType().equals(HazardTypes.IncreaseCircleSpeed)) {
+                    hazard.onDraw(increaseCircleSpeedTexture, getZoomba().getSpriteBatch());
+                } else if (hazard.getHazardType().equals(HazardTypes.InstantLoss)) {
+                    hazard.onDraw(instantLossTexture, getZoomba().getSpriteBatch());
+                } else if (hazard.getHazardType().equals(HazardTypes.Invertibility)) {
+                    hazard.onDraw(invertibilityTexture, getZoomba().getSpriteBatch());
+                } else if (hazard.getHazardType().equals(HazardTypes.Invisibility)) {
+                    hazard.onDraw(invisibilityTexture, getZoomba().getSpriteBatch());
+                }
             }
         }
 

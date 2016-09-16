@@ -1,8 +1,6 @@
 package com.zoomba.GameObjects.ObjectFactory.Objects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Timer;
 import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
 import com.zoomba.Services.Interfaces.Pickup;
 import com.zoomba.Services.Interfaces.PlayerFocus;
@@ -13,6 +11,7 @@ import com.zoomba.Services.Interfaces.PlayerFocus;
 public abstract class Hazard extends GameObject implements Pickup, PlayerFocus {
     private int existence, lifetime;
     private HazardTypes hazardType;
+    private boolean isInvoked = false, isAlive = true, isPickupUp = false;
 
     public Hazard(float x, float y, float radius, float orientation, float velocity, int lifetime,
                   int existence, HazardTypes hazardType) {
@@ -20,27 +19,12 @@ public abstract class Hazard extends GameObject implements Pickup, PlayerFocus {
         this.lifetime = lifetime;
         this.existence = existence;
         this.hazardType = hazardType;
-        startLifetimeTimer();
     }
 
-    public void startExistenceTimer() {
-        Gdx.app.log("Timer", "Starting lifetime timer");
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                existence--;
-            }
-        }, 1f);
-    }
-
-    public void startLifetimeTimer() {
-        Gdx.app.log("Timer", "Starting lifetime timer");
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                lifetime--;
-            }
-        }, 1f);
+    @Override
+    public void onUpdate() {
+        if (getLifetime() < 0 || getExistence() < 0) setAlive(false);
+        if (isInvoked()) lifetime--; else existence--;
     }
 
     public int getExistence() {
@@ -53,5 +37,29 @@ public abstract class Hazard extends GameObject implements Pickup, PlayerFocus {
 
     public HazardTypes getHazardType() {
         return hazardType;
+    }
+
+    public boolean isInvoked() {
+        return isInvoked;
+    }
+
+    public void setInvoked(boolean invoked) {
+        isInvoked = invoked;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
+    }
+
+    public boolean isPickupUp() {
+        return isPickupUp;
+    }
+
+    public void setPickupUp(boolean pickupUp) {
+        isPickupUp = pickupUp;
     }
 }

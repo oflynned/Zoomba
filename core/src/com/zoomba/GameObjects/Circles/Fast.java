@@ -13,6 +13,11 @@ public class Fast extends Circle {
     }
 
     @Override
+    public void onUpdate() {
+
+    }
+
+    @Override
     public void onFocus() {
 
     }

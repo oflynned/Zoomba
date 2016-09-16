@@ -1,7 +1,6 @@
 package com.zoomba.GameObjects.ObjectFactory.Objects;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Timer;
 import com.zoomba.GameObjects.ObjectFactory.Types.PowerupTypes;
 import com.zoomba.Services.Interfaces.Pickup;
 import com.zoomba.Services.Interfaces.PlayerFocus;
@@ -12,6 +11,7 @@ import com.zoomba.Services.Interfaces.PlayerFocus;
 public abstract class Powerup extends GameObject implements Pickup, PlayerFocus {
     private int existence, lifetime;
     private PowerupTypes powerupType;
+    private boolean isInvoked;
 
     public Powerup(float x, float y, float radius, float orientation, float velocity,
                    int lifetime, int existence, PowerupTypes powerupType) {
@@ -19,27 +19,12 @@ public abstract class Powerup extends GameObject implements Pickup, PlayerFocus 
         this.lifetime = lifetime;
         this.existence = existence;
         this.powerupType = powerupType;
-
-        onLifetimeTimer();
-        onPickupTimer();
+        setInvoked(false);
     }
 
-    public void onLifetimeTimer() {
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                lifetime--;
-            }
-        }, 1f);
-    }
-
-    public void onPickupTimer() {
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                existence--;
-            }
-        }, 1f);
+    @Override
+    public void onUpdate() {
+        if (isInvoked()) lifetime--; else existence--;
     }
 
     public int getExistence() {
@@ -52,5 +37,13 @@ public abstract class Powerup extends GameObject implements Pickup, PlayerFocus 
 
     public PowerupTypes getPowerupType() {
         return powerupType;
+    }
+
+    public boolean isInvoked() {
+        return isInvoked;
+    }
+
+    public void setInvoked(boolean invoked) {
+        isInvoked = invoked;
     }
 }

@@ -1,7 +1,6 @@
 package com.zoomba.GameObjects.Hazards;
 
 import com.zoomba.GameObjects.ObjectFactory.Objects.Circle;
-import com.zoomba.GameObjects.ObjectFactory.Objects.GameObject;
 import com.zoomba.GameObjects.ObjectFactory.Objects.Hazard;
 import com.zoomba.GameObjects.ObjectFactory.Types.HazardTypes;
 
